@@ -1,0 +1,9 @@
+
+# Log files
+*.log
+
+# Python environment
+env/
+
+# ignore junit reports
+*.junit.xml
