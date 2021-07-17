@@ -1,0 +1,137 @@
+  - name: "Docker Network - 'ingress'"
+    docker_network:
+      name: "{{ DOCKER_NETWORK_INGRESS_HTTP }}"
+      internal: no
+      state: present
+    when: docker_installed is defined
+    tags:
+      - configure
+      - install
+      - prepare
+
+
+  - name: "Create a directory Structure - config"
+    file:
+      path: "{{ DIRECTORY_STRUCTURE_CONFIG }}/nginx-ingress"
+      state: directory
+      mode: '0755'
+    tags:
+      - configure
+      - install
+      - prepare
+
+
+  - name: "Create a directory Structure - conf.d"
+    file:
+      path: "{{ DIRECTORY_PATH_INGRESS_CONFIG }}"
+      state: directory
+      mode: '0755'
+    tags:
+      - configure
+      - install
+      - prepare
+
+
+  - name: "Create a directory Structure - SSL"
+    file:
+      path: "{{ DIRECTORY_STRUCTURE_CONFIG }}/nginx-ingress/ssl"
+      state: directory
+      mode: '0755'
+    tags:
+      - configure
+      - install
+      - prepare
+
+
+  - name: Ingress Docker Container - 'nginx'
+    docker_container:
+      name: "{{ DOCKER_CONTAINER_INGRESS_HTTP }}"
+      image: "{{ DOCKER_IMAGE_NGINX }}:{{ DOCKER_IMAGE_NGINX_TAG }}"
+      memory: 200M
+      comparisons: 
+        'networks': allow_more_present
+        '*': strict
+      ignore_image: no
+      state: started
+      restart_policy: always
+      exposed_ports:
+        - "80"
+        - "81"
+        - "443"
+      published_ports:
+        - "80:80"
+        - "127.0.0.1:81:81"
+        - "443:443"
+#        env:
+#        - NGINX_HOST=${NGINX_WEB_HOST_NAME}
+      volumes:
+        - /etc/timezone:/etc/timezone:ro
+        - /etc/localtime:/etc/localtime:ro
+#        - "{{ DIRECTORY_STRUCTURE_CONFIG }}/ingress-nginx-default.conf:/etc/nginx/conf.d/default.conf:ro"
+        - "{{ DIRECTORY_STRUCTURE_CONFIG }}/nginx-ingress/conf.d:/etc/nginx/conf.d:ro"
+        - "{{ DIRECTORY_STRUCTURE_CONFIG }}/CA/Public:/ssl-certs/public:ro"
+        - "{{ DIRECTORY_STRUCTURE_CONFIG }}/nginx-ingress/ssl:/ssl-certs"
+        - "{{ DIRECTORY_STRUCTURE_LOGS }}/{{ DIRECTORY_NAME_LOGS_INGRESS }}:/var/log/nginx:rw"
+      networks_cli_compatible: yes
+      networks:
+        - name: "{{ DOCKER_NETWORK_INGRESS_HTTP }}"
+#      purge_networks: yes
+      userns_mode: "host"
+    register: docker_container_ingress_nginx
+    when: "DOCKER_INGRESS == 'nginx' and docker_installed is defined"
+    tags:
+      - configure
+      - install
+
+
+  - name: Configure nginx
+    template:
+      src: ingress-nginx-default.conf.j2
+      dest: "{{ DIRECTORY_STRUCTURE_CONFIG }}/nginx-ingress/conf.d/ingress-nginx-default.conf"
+      owner: root
+      mode: 0644
+    when: "docker_installed is defined and DOCKER_INGRESS == 'nginx' and docker_container_ingress_nginx is defined"
+    notify: "Restart Ingress Docker Container"
+    tags:
+      - configure
+      - install
+      - prepare
+
+
+  - name: Configure nginx - 'Default SSL'
+    template:
+      src: nginx-ssl.conf.j2
+      dest: "{{ DIRECTORY_STRUCTURE_CONFIG }}/nginx-ingress/conf.d/nginx-ssl.conf"
+      owner: root
+      mode: 0644
+    when: "docker_installed is defined and DOCKER_INGRESS == 'nginx' and docker_container_ingress_nginx is defined"
+    notify: "Restart Ingress Docker Container"
+    tags:
+      - configure
+      - install
+      - prepare
+
+
+  - name: "logrotate config - 'nginx-ingress'"
+    template:
+      src: logroate_nginx-ingress.j2
+      dest: "/etc/logrotate.d/ansible-nginx_ingress"
+      owner: root
+      mode: 0644
+      force: yes
+    when: logrotate_installed is defined and docker_installed is defined and DOCKER_INGRESS == 'nginx' and docker_container_ingress_nginx is defined
+    tags:
+      - configure
+      - install
+
+  - name: "Export defaults for playbook - Ingress"
+    set_fact:
+      DOCKER_CONTAINER_INGRESS_HTTP: "{{ DOCKER_CONTAINER_INGRESS_HTTP }}"
+      DOCKER_NETWORK_INGRESS_HTTP: "{{ DOCKER_NETWORK_INGRESS_HTTP }}"
+      DIRECTORY_NAME_LOGS_INGRESS: "{{ DIRECTORY_NAME_LOGS_INGRESS }}"
+    tags:
+      - configure
+      - install
+      - prepare
+
+

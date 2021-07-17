@@ -1,0 +1,25 @@
+{{ DIRECTORY_STRUCTURE_LOGS }}/{{ DIRECTORY_NAME_LOGS_INGRESS }}/error*.log {
+	daily
+	missingok
+	rotate 7
+	postrotate
+		kill -USR1 `cat /run/nginx.pid`
+	endscript
+	compress
+	delaycompress
+	notifempty
+}
+
+{{ DIRECTORY_STRUCTURE_LOGS }}/{{ DIRECTORY_NAME_LOGS_INGRESS }}/access*.log {
+	daily
+	missingok
+	rotate 7
+	postrotate
+		kill -USR1 `cat /run/nginx.pid`
+	endscript
+	compress
+	delaycompress
+	notifempty
+}
+
+

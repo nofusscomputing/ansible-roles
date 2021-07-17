@@ -1,0 +1,17 @@
+
+
+  - name: "Restart Ingress Docker Container"
+    docker_container:
+      name: "ingress"
+      state: "started"
+      restart: yes
+    when: "docker_installed is defined and DOCKER_INGRESS == 'nginx' and docker_container_ingress_nginx is defined"
+    tags:
+      - configure
+      - install
+
+
+
+
+
+

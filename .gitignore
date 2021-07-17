@@ -1,0 +1,6 @@
+
+# Log files
+*.log
+
+# Python environment
+env/

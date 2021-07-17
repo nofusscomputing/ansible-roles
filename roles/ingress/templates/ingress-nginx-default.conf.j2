@@ -1,0 +1,41 @@
+server_tokens off;
+
+proxy_hide_header Server;
+
+proxy_hide_header X-Powered-By;
+
+access_log  /var/log/nginx/access-default.log  main;
+
+
+
+server {
+
+    listen 80;
+#    server_name  mysite.localhost;
+
+    #charset koi8-r;
+    access_log  /var/log/nginx/access.log  main;
+
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+
+
+        location /.well-known/acme-challenge {
+                
+                proxy_pass        http://certbot/.well-known/acme-challenge;
+                proxy_redirect    off;
+
+                proxy_set_header    Host              $http_host;
+                proxy_set_header    X-Real-IP         $remote_addr;
+                proxy_set_header    X-Forwarded-For   $remote_addr;
+        }
+
+}
+
+
+
+
+
+

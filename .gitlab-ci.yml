@@ -1,0 +1,30 @@
+#variables:
+#    Release_TAG: Publish-$CI_COMMIT_SHORT_SHA
+
+stages:
+    - lint
+    - mirror
+
+include:
+  - local: .gitlab-ci-lint.yml
+
+To Github:
+    image: alpine:latest
+    stage: mirror
+    before_script:
+        - apk update
+        - apk add git
+    script:
+        - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/$CI_PROJECT_PATH --mirror $CI_PROJECT_NAME
+        - cd $CI_PROJECT_NAME 
+        - git remote add github https://$GITHUB_USERNAME_ROBOT:$GITHUB_TOKEN_ROBOT@github.com/NoFussComputing/ansible-roles.git 
+        - echo "https://gitlab.com/ $CI_PROJECT_PATH / $CI_PROJECT_NAME .git"
+        - git push github --mirror
+    artifacts:
+        expire_in: 1 day
+    rules:
+      - if: '$CI_COMMIT_BRANCH == "master"'
+        when: always
+#      - when: always
+
+
