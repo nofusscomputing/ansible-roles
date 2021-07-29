@@ -1,6 +1,9 @@
 # Ansible Roles
 
-[![Gitlab pipeline status (self-hosted)](https://img.shields.io/gitlab/pipeline/nofusscomputing/infrastructure/ansible-roles/master?color=ff782e&gitlab_url=https%3A%2F%2Fgitlab.com&label=Build%20%5B%20Stable%20%5D&logo=gitlab&style=plastic)](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles)
+[![Gitlab build status - stable](https://img.shields.io/badge/dynamic/json?color=ff782e&label=Build%20%5B%20Stable%20%5D&query=0.status&url=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F28204898%2Fpipelines%3Fref%3Dmaster&logo=gitlab&style=plastic)](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles)
+
+
+[![Gitlab build status - development](https://img.shields.io/badge/dynamic/json?color=ff782e&label=Build%20[%20Development%20]&query=0.status&url=https%3A%2F%2Fgitlab.com%2Fapi%2Fv4%2Fprojects%2F28204898%2Fpipelines%3Fref%3Ddevelopment&logo=gitlab&style=plastic)](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles)
 
 
 This repository is hosted on [gitlab.com](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles) and has a read-only copy hosted on [github.com](https://github.com/NoFussComputing/ansible-roles).
