@@ -53,4 +53,3 @@ Ansible Lint:
         - .linter_defaults
     image: python:3.6-slim
 
-
