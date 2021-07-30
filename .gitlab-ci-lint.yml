@@ -1,6 +1,6 @@
 
 .linter_defaults:
-    stage: lint
+    stage: validation
     before_script:
         - export PYTHON_VERSION=`python -c 'import sys; version=sys.version_info[:3]; print("{0}.{1}.{2}".format(*version))'`
         - apt update
@@ -8,26 +8,20 @@
         - python3 -m venv env
         - . env/bin/activate
         - pip install --upgrade pip
-        - pip install wheel
         - pip install wheel 
         - pip install ansible
         - pip install setuptools_rust 
         - pip install Rust 
-        - pip3 install "ansible-lint[yamllint]"
+        - pip3 install ansible-lint
+        - pip3 install yamllint
         - pip install lxml
-        - pip install ansible-lint-junit
-    script:
+#        - pip install ansible-lint-junit
+        - pip install ansible-lint-to-junit-xml
         - mkdir $PYTHON_VERSION
-        - yamllint -f parsable roles/ > $PYTHON_VERSION/yaml-lint.junit.log 1>&1 || YAML_LINT=$?
-        - cat $PYTHON_VERSION/yaml-lint.junit.log | ansible-lint-junit -o $PYTHON_VERSION/yaml-lint.junit.xml
-        - ansible-lint -p --nocolor --parseable-severity > $PYTHON_VERSION/ansible-lint.junit.log 1>&1 || ANSIBLE_LINT=$?
-        - cat $PYTHON_VERSION/ansible-lint.junit.log | ansible-lint-junit -o $PYTHON_VERSION/ansible-lint.junit.xml
+    script:
+        - ansible-lint -p --nocolor --parseable-severity roles/ > $PYTHON_VERSION/ansible-lint.junit.log 1>&1 || ANSIBLE_LINT=$?
+        - cat $PYTHON_VERSION/ansible-lint.junit.log | ansible-lint-to-junit-xml > $PYTHON_VERSION/ansible-lint.junit.xml
         - ls -la $PYTHON_VERSION
-#        - sed -i 's/<testsuites/<testsuites name="YAML Lint" id="YAML Lint"/g' $PYTHON_VERSION/yaml-lint.junit.xml
-#        - sed -i 's/<testsuite /<testsuite name="YAML Lint" id="YAML Lint" /g' $PYTHON_VERSION/yaml-lint.junit.xml
-#        - sed -i 's/<testsuites/<testsuites name="Ansible Lint" id="Ansible Lint"/g' $PYTHON_VERSION/ansible-lint.junit.xml
-#        - sed -i 's/<testsuite /<testsuite name="Ansible Lint" id="Ansible Lint" /g' $PYTHON_VERSION/ansible-lint.junit.xml
-        - if [ $YAML_LINT > 0 ]; then echo "yaml lint failed with $YAML_LINT"; exit $YAML_LINT; fi
         - if [ $ANSIBLE_LINT > 0 ]; then echo "ansible lint failed with $ANSIBLE_LINT"; exit $ANSIBLE_LINT; fi
     after_script:
         - echo deactivate
@@ -37,49 +31,26 @@
       paths:
           - "*/*.junit.*"
       reports:
-          junit: "*/*.junit.xml"
-
+          junit:
+              - "*/*.junit.xml"
     rules:
-      - if: '$CI_COMMIT_BRANCH != "master"'
-        when: always
+        - if: '$CI_COMMIT_BRANCH != "master"'
+          when: always
 
 
-# ansible-lint -q -p | ansible-lint-to-junit-xml > ansible-lint-results.xml
-# ansible-lint -q -p > ansible-lint-results.log
-# ansible-lint-to-junit-xml ansible-lint-results.log > ansible-lint-results.xml
-
-# ansible-lint-junit lxml
-# 
-
-# pysam: no cython available - using pre-compiled C
-#Python 3.9:
+#YAML Lint:
 #    extends:
 #        - .linter_defaults
-#    image: python:3.9-slim
+#    image: python:3.6-slim
+#    script:
+#        - yamllint -f parsable roles/ > $PYTHON_VERSION/yaml-lint.junit.log 1>&1 || YAML_LINT=$?
+#        - cat $PYTHON_VERSION/yaml-lint.junit.log | ansible-lint-junit -o $PYTHON_VERSION/yaml-lint.junit.xml
+#        - if [ $YAML_LINT > 0 ]; then echo "yaml lint failed with $YAML_LINT"; exit $YAML_LINT; fi
 
-Python 3.8:
-    extends:
-        - .linter_defaults
-    image: python:3.8-slim
 
-
-Python 3.6:
-#    variables:
-#        VERSION_PYTHON: public/$CI_COMMIT_BRANCH/coverage
+Ansible Lint:
     extends:
         - .linter_defaults
     image: python:3.6-slim
 
-
-
-
-# python3 -m venv env
-#. env/bin/activate
-# pip install --upgrade pip
-# pip install wheel
-# pip3 install "ansible-lint[yamllint]"
-# pip install wheel setuptools_rust ansible Rust 
-
-
-#deactivate
 
