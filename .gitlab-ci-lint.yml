@@ -34,8 +34,11 @@
           junit:
               - "*/*.junit.xml"
     rules:
-        - if: '$CI_COMMIT_BRANCH != "master"'
+        - if: '$CI_COMMIT_BRANCH == "master"'
+          when: never
+        - if: '$CI_COMMIT_BRANCH'
           when: always
+        - when: never
 
 
 #YAML Lint:
@@ -52,5 +55,4 @@ Ansible Lint:
     extends:
         - .linter_defaults
     image: python:3.6-slim
-
 
