@@ -6,11 +6,6 @@ import gitlab
 import os
 import sys
 import getopt
-#import gitlab.v4.objects
-
-#from commitizen import Check
-#from commitizen import commands, config
-
 
 get_first_commit = False
 get_mr_title = False
@@ -28,7 +23,6 @@ for opt, arg in opts:
         print('[commit.py] -i <inputfile> -o <outputfile>')
         sys.exit()
     elif opt in ("-c", "--commit"):
-       #inputfile = arg
         get_first_commit = True
     elif opt in ("-t", "--token"):
        ci_job_token = arg
@@ -40,15 +34,6 @@ for opt, arg in opts:
        git_branch = arg
     elif opt in ("-o", "--target-branch"):
        get_target_branch = True
-
-
-
-#try:
-#    if os.environ['CI_JOB_TOKEN']:
-#        ci_job_token = os.environ['CI_JOB_TOKEN']
-#except:
-#    pass
-#else:
 
 # private token or personal token authentication
 gl = gitlab.Gitlab('https://gitlab.com', private_token=ci_job_token)
@@ -67,18 +52,15 @@ for mr in project_mrs:
 
         #print('\n\nMR=[-{0}-]'.format(mr))
 
+
 if get_target_branch:
     print('{0}'.format(target_branch))
+
 
 if get_first_commit:
 
     print('{0}'.format(mr_first_commit))
-    #for mr in gl.mergerequests.list():
-    #for mr in project.mergerequests.list():
-        #print('\n\nMR=[-{0}-]'.format(mr))
-        #print('\n\nsource_branch=[-{0}-]'.format(mr.source_branch))
-        #print('\n\nsha=[-{0}-]'.format(mr.sha))
-        #print('{0}'.format(mr.sha))
+
 
 if get_mr_title:
 
