@@ -26,6 +26,9 @@ Github (Push --mirror):
         when: always
 
 Commits:
+    variables:
+        GIT_DEPTH: 150
+        GIT_STRATEGY: clone
     image: python:3.6-slim
     stage: validation
     before_script:
@@ -39,6 +42,8 @@ Commits:
         - pip install commitizen
 #        - mkdir $PYTHON_VERSION
     script:
+        - ls -la .git/
+        - cat .git/ORIG_HEAD
         #- cz check --message "$(./commit.py --token $CI_JOB_TOKEN --project $CI_PROJECT_ID --title)" > mr_title.log 2>&1 || title_failed=$?
         - cz check --message "$(./commit.py --token $API_RO --project $CI_PROJECT_ID --title --branch $CI_COMMIT_BRANCH)" > mr_title.log 2>&1 || title_failed=$?
         - cz check --rev-range ORIG_HEAD..HEAD > mr_commits.log 2>&1 || commits_failed=$?
