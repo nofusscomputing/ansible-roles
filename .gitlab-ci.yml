@@ -5,6 +5,7 @@ stages:
 
 include:
   - local: .gitlab-ci-lint.yml
+  - local: .gitlab-ci-validation.yml
 
 Github (Push --mirror):
     image: alpine:latest
@@ -24,47 +25,4 @@ Github (Push --mirror):
       - if: '$CI_COMMIT_BRANCH == "master"'
       - if: '$CI_COMMIT_BRANCH == "development"'
         when: always
-
-Commits:
-    variables:
-        GIT_STRATEGY: none
-    image: python:3.6-slim
-    stage: validation
-    before_script:
-        - export PYTHON_VERSION=`python -c 'import sys; version=sys.version_info[:3]; print("{0}.{1}.{2}".format(*version))'`
-        - apt update
-        - apt install --no-install-recommends -y git
-        - python3 -m venv env
-        - . env/bin/activate
-        - pip install --upgrade pip
-        - pip install python-gitlab
-        - pip install commitizen
-        - git clone --depth 150 $CI_REPOSITORY_URL check
-        - cd check
-        - git remote rm origin
-        - git remote add origin $CI_REPOSITORY_URL
-        - git fetch --all
-        - git checkout --track origin/$CI_COMMIT_BRANCH
-        - target_branch=$(./commit.py --token $API_RO --project $CI_PROJECT_ID --branch $CI_COMMIT_BRANCH --target-branch)
-        - echo "[DEBUG] Target Branch[$target_branch]"
-        - first_sha1=$(git log $target_branch..$CI_COMMIT_BRANCH --format=format:%H | tail -1)
-        - echo "[DEBUG] First Commit SHA[$first_sha1]"
-    script:
-        #- cz check --message "$(./commit.py --token $CI_JOB_TOKEN --project $CI_PROJECT_ID --title)" > mr_title.log 2>&1 || title_failed=$?
-        - cz check --message "$(./commit.py --token $API_RO --project $CI_PROJECT_ID --title --branch $CI_COMMIT_BRANCH)" > mr_title.log 2>&1 || title_failed=$?
-        - cz check --rev-range $first_sha1..HEAD > mr_commits.log 2>&1 || commits_failed=$?
-#ToDo: below doesn't work as python-gitlab does not return `diff_refs` with api request
-        #- cz check --rev-range $(./commit.py --token $API_RO --project $CI_PROJECT_ID --commit --branch $CI_COMMIT_BRANCH)..HEAD || commits_failed=$?
-        - if [ $title_failed > 0 ]; then echo "MR title format incorrect $title_failed"; cat mr_title.log; exit $title_failed; fi
-        - if [ $commits_failed > 0 ]; then echo "commits format is incorrect"; cat mr_commits.log; exit $commits_failed; fi
-    after_script:
-        - cd ..
-        - rm -Rf check
-    rules:
-      - if: '$CI_COMMIT_BRANCH == "master"'
-        when: never
-      - if: '$CI_COMMIT_BRANCH'
-        when: always
-      - when: never
-# No commit found with range: '..HEAD' exit=3
 
