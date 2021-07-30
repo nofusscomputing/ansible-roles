@@ -19,7 +19,7 @@
         - git remote add origin $CI_REPOSITORY_URL
         - git fetch --all
         - git checkout --track origin/$CI_COMMIT_BRANCH
-        - target_branch=$(./commit.py --token $API_RO --project $CI_PROJECT_ID --branch $CI_COMMIT_BRANCH --target-branch)
+        - target_branch=$(./CI/scripts/commit.py --token $API_RO --project $CI_PROJECT_ID --branch $CI_COMMIT_BRANCH --target-branch)
         - echo "[DEBUG] Target Branch[$target_branch]"
         - first_sha1=$(git log $target_branch..$CI_COMMIT_BRANCH --format=format:%H | tail -1)
         - echo "[DEBUG] First Commit SHA[$first_sha1]"
@@ -39,7 +39,7 @@ MR Title:
     extends:
         - .conventional_commit
     script:
-        - - cz check --message "$(./commit.py --token $API_RO --project $CI_PROJECT_ID --title --branch $CI_COMMIT_BRANCH)" > mr_title.log 2>&1 || title_failed=$?
+        - - cz check --message "$(./CI/scripts/commit.py --token $API_RO --project $CI_PROJECT_ID --title --branch $CI_COMMIT_BRANCH)" > mr_title.log 2>&1 || title_failed=$?
         - if [ $title_failed > 0 ]; then echo "MR title format incorrect $title_failed"; cat mr_title.log; exit $title_failed; fi
 
 
