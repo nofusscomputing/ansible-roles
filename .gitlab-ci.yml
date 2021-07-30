@@ -25,3 +25,30 @@ Github (Push --mirror):
       - if: '$CI_COMMIT_BRANCH == "development"'
         when: always
 
+Commits:
+    image: python:3.6-slim
+    stage: validation
+    before_script:
+        - export PYTHON_VERSION=`python -c 'import sys; version=sys.version_info[:3]; print("{0}.{1}.{2}".format(*version))'`
+        - apt update
+        - apt install --no-install-recommends -y git
+        - python3 -m venv env
+        - . env/bin/activate
+        - pip install --upgrade pip
+        - pip install python-gitlab
+        - pip install commitizen
+#        - mkdir $PYTHON_VERSION
+    script:
+        #- cz check --message "$(./commit.py --token $CI_JOB_TOKEN --project $CI_PROJECT_ID --title)" > mr_title.log 2>&1 || title_failed=$?
+        - cz check --message "$(./commit.py --token $CI_JOB_TOKEN --project $CI_PROJECT_ID --title)" > mr_title.log 2>&1 || title_failed=$?
+        #- cz check --rev-range $(./commit.py --token $CI_JOB_TOKEN --project $CI_PROJECT_ID --commit)..HEAD > mr_commits.log 2>&1 || commits_failed=$?
+        - cz check --rev-range $(./commit.py --token $CI_JOB_TOKEN --project $CI_PROJECT_ID --commit)..HEAD || commits_failed=$?
+        - if [ $title_failed > 0 ]; then echo "MR title format incorrect $title_failed"; exit $title_failed; fi
+        - if [ $commits_failed > 0 ]; then echo "commits format is incorrect"; exit $commits_failed; fi
+    rules:
+      - if: '$CI_COMMIT_BRANCH == "master"'
+        when: never
+      - if: '$CI_COMMIT_BRANCH'
+        when: always
+      - when: never
+# No commit found with range: '..HEAD' exit=3
