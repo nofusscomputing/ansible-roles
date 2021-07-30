@@ -26,6 +26,12 @@ Github (Push --mirror):
         when: always
 
 Commits:
+    variables:
+#        GIT_DEPTH: 150
+#        GIT_STRATEGY: clone
+        GIT_STRATEGY: none
+#        GIT_CHECKOUT: "false"
+#        GIT_CLONE_PATH: $CI_BUILDS_DIR/check
     image: python:3.6-slim
     stage: validation
     before_script:
@@ -39,9 +45,20 @@ Commits:
         - pip install commitizen
 #        - mkdir $PYTHON_VERSION
     script:
+        - git clone --depth 150 $CI_REPOSITORY_URL check
+        - cd check
+        - git fetch --all
+        - git branch
+        - git checkout $CI_COMMIT_BRANCH
+        - ls -la 
+#        - cat .git/ORIG_HEAD
+        - target_branch=$(./commit.py --token $API_RO --project $CI_PROJECT_ID --branch $CI_COMMIT_BRANCH --target-branch)
+        - echo $target_branch
+        - first_sha1=$(git log $target_branch..$CI_COMMIT_BRANCH --format=format:%H | tail -1)
+        - echo $first_sha1
         #- cz check --message "$(./commit.py --token $CI_JOB_TOKEN --project $CI_PROJECT_ID --title)" > mr_title.log 2>&1 || title_failed=$?
         - cz check --message "$(./commit.py --token $API_RO --project $CI_PROJECT_ID --title --branch $CI_COMMIT_BRANCH)" > mr_title.log 2>&1 || title_failed=$?
-        - cz check --rev-range ORIG_HEAD..HEAD > mr_commits.log 2>&1 || commits_failed=$?
+        - cz check --rev-range $first_sha1..HEAD > mr_commits.log 2>&1 || commits_failed=$?
 #ToDo: below doesn't work as python-gitlab does not return `diff_refs` with api request
         #- cz check --rev-range $(./commit.py --token $API_RO --project $CI_PROJECT_ID --commit --branch $CI_COMMIT_BRANCH)..HEAD || commits_failed=$?
         - if [ $title_failed > 0 ]; then echo "MR title format incorrect $title_failed"; cat mr_title.log; exit $title_failed; fi
