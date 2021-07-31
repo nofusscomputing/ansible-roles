@@ -24,29 +24,39 @@
         - first_sha1=$(git log $target_branch..$CI_COMMIT_BRANCH --format=format:%H | tail -1)
         - echo "[DEBUG] First Commit SHA[$first_sha1]"
     after_script:
+        - mv cz_output.log ../cz_output.log
         - cd ..
         - rm -Rf check
+    artifacts:
+        expire_in: 3 days
+        when: always
+        paths:
+            - "*.junit.xml"
+            - "*.log"
+        reports:
+            junit:
+                - "*.junit.xml"
     rules:
       - if: '$CI_COMMIT_BRANCH == "master"'
         when: never
       - if: '$CI_COMMIT_BRANCH'
         when: always
       - when: never
-# No commit found with range: '..HEAD' exit=3
 
 
 MR Title:
     extends:
         - .conventional_commit
     script:
-        - - cz check --message "$(./CI/scripts/commit.py --token $API_RO --project $CI_PROJECT_ID --title --branch $CI_COMMIT_BRANCH)" > mr_title.log 2>&1 || title_failed=$?
-        - if [ $title_failed > 0 ]; then echo "MR title format incorrect $title_failed"; cat mr_title.log; exit $title_failed; fi
+        - cz_exit=0 && cz check --message "$(./CI/scripts/commit.py --token $API_RO --project $CI_PROJECT_ID --title --branch $CI_COMMIT_BRANCH)" > cz_output.log 2>&1 || cz_exit=$?
+        - . ./CI/scripts/cz_junit.sh > ../cz.junit.xml
 
 
-Commits:
+Commit Messages:
     extends:
         - .conventional_commit
     script:
-        - cz check --rev-range $first_sha1..HEAD > mr_commits.log 2>&1 || commits_failed=$?
-        - if [ $commits_failed > 0 ]; then echo "commits format is incorrect"; cat mr_commits.log; exit $commits_failed; fi
+        - cz_exit=0 && cz check --rev-range $first_sha1..HEAD > cz_output.log 2>&1 || cz_exit=$?
+        - . ./CI/scripts/cz_junit.sh > ../cz.junit.xml
+
 
