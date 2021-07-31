@@ -4,8 +4,8 @@ stages:
     - sync
 
 include:
-  - local: CI/.gitlab-ci-lint.yml
-  - local: CI/.gitlab-ci-validation.yml
+  - local: CI/ansible/.gitlab-ci.yml
+  - local: CI/commitizen/.gitlab-ci.yml
 
 Github (Push --mirror):
     image: alpine:latest
