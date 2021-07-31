@@ -17,7 +17,7 @@ system_err=''
 
 cat <<EOF
 <testsuite errors="0" name="Conventional Commits Messages Check" tests="0">
-    <testcase classname="Conventional Commits" file="https://www.conventionalcommits.org/en/v1.0.0/" name="Using Conventional Commits Message Format"/>
+    <testcase classname="Conventional Commits" file="CI/commitizen/README.md" name="Using Conventional Commits Message Format"/>
 </testsuite>
 EOF
 
@@ -29,7 +29,7 @@ system_err="ERROR: $cz_command"
 cat <<EOF
 <testsuites id="Conventional Commits Messages Check" name="CI Validation test" tests="1" errors="$error_count" time="0">
     <testsuite id="conventional commit" name="testing" tests="1" failures="$error_count" time="0">
-        <testcase classname="Conventional Commits" file="https://www.conventionalcommits.org/en/v1.0.0/" line="0" name="Using Conventional Commits Message Format" time="0" timestamp="$(date '+%Y-%m-%d %H:%M:%S')">
+        <testcase classname="Conventional Commits" file="CI/commitizen/README.md" line="0" name="Using Conventional Commits Message Format" time="0" timestamp="$(date '+%Y-%m-%d %H:%M:%S')">
 
             <failure message="Conventional commits not used" type="validation">$cz_command
             </failure>
