@@ -2,8 +2,9 @@
 # Log files
 *.log
 
-# Python environment
+# Python environments
 env/
+dev_env/
 
 # ignore junit reports
 *.junit.xml
