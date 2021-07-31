@@ -19,7 +19,7 @@
         - git remote add origin $CI_REPOSITORY_URL
         - git fetch --all
         - git checkout --track origin/$CI_COMMIT_BRANCH
-        - target_branch=$(./CI/scripts/commit.py --token $API_RO --project $CI_PROJECT_ID --branch $CI_COMMIT_BRANCH --target-branch)
+        - target_branch=$(./CI/commitizen/scripts/commit.py --token $API_RO --project $CI_PROJECT_ID --branch $CI_COMMIT_BRANCH --target-branch)
         - echo "[DEBUG] Target Branch[$target_branch]"
         - first_sha1=$(git log $target_branch..$CI_COMMIT_BRANCH --format=format:%H | tail -1)
         - echo "[DEBUG] First Commit SHA[$first_sha1]"
@@ -48,8 +48,8 @@ MR Title:
     extends:
         - .conventional_commit
     script:
-        - cz_exit=0 && cz check --message "$(./CI/scripts/commit.py --token $API_RO --project $CI_PROJECT_ID --title --branch $CI_COMMIT_BRANCH)" > cz_output.log 2>&1 || cz_exit=$?
-        - . ./CI/scripts/cz_junit.sh > ../cz.junit.xml
+        - cz_exit=0 && cz check --message "$(./CI/commitizen/scripts/commit.py --token $API_RO --project $CI_PROJECT_ID --title --branch $CI_COMMIT_BRANCH)" > cz_output.log 2>&1 || cz_exit=$?
+        - . ./CI/commitizen/scripts/cz_junit.sh > ../cz.junit.xml
 
 
 Commit Messages:
@@ -57,6 +57,6 @@ Commit Messages:
         - .conventional_commit
     script:
         - cz_exit=0 && cz check --rev-range $first_sha1..HEAD > cz_output.log 2>&1 || cz_exit=$?
-        - . ./CI/scripts/cz_junit.sh > ../cz.junit.xml
+        - . ./CI/commitizen/scripts/cz_junit.sh > ../cz.junit.xml
 
 
