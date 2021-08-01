@@ -1,53 +1,42 @@
 Gitlab:
     stage: release
     image: registry.gitlab.com/gitlab-org/release-cli:latest
-#    variables:
-#        GIT_STRATEGY: none
     before_script:
         - apk update
         - apk add git
         - apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python
         - python -m ensurepip  && ln -sf pip3 /usr/bin/pip
         - pip install --upgrade pip
-        - pip install -r ./CI/commitizen/requirements.txt
+        - pip install -r ./CI/gitlab_release/requirements.txt
         - 'CLONE_URL="https://gitlab-ci-token:$API_RO_GIT_WR@gitlab.com/$CI_PROJECT_PATH.git"'
         - echo "[DEBUG] CLONE_URL[$CLONE_URL]"
         - git clone -b $CI_COMMIT_BRANCH $CLONE_URL repo
         - cd repo
-#        - git remote rm origin
-#        - git remote add origin $CLONE_URL
-#        - git fetch --all
         - git branch
         - git config --global user.email "CI@nfc-gitlab"
         - git config --global user.name "NFC CI"
         - git push --set-upstream origin $CI_COMMIT_BRANCH
     script:
-        - VERSION_CURRENT=$(cz version --project)
+        - RELEASE_VERSION_CURRENT=$(cz version --project)
         - RELEASE_CHANGELOG=$(cz bump --changelog --changelog-to-stdout)
+        - RELEASE_VERSION_NEW=$(cz version --project)
+        - RELEASE_TAG=v$RELEASE_VERSION_NEW
         - git tag -d $RELEASE_TAG
-        - VERSION_NEW=$(cz version --project)
-        - RELEASE_TAG=v$VERSION_NEW
-        - echo "[DEBUG] VERSION_CURRENT[$VERSION_CURRENT]"
+        - echo "[DEBUG] RELEASE_VERSION_CURRENT[$RELEASE_VERSION_CURRENT]"
         - echo "[DEBUG] RELEASE_CHANGELOG[$RELEASE_CHANGELOG]"
-        - echo "[DEBUG] VERSION_NEW[$VERSION_NEW]"
+        - echo "[DEBUG] RELEASE_VERSION_NEW[$RELEASE_VERSION_NEW]"
         - echo "[DEBUG] RELEASE_TAG[$RELEASE_TAG]"
-        - TAG_SHA1=$(git log HEAD  --format=format:%H | tail -1)
-        - echo "[DEBUG] TAG_SHA1[$TAG_SHA1]"
+        - RELEASE_TAG_SHA1=$(git rev-parse $CI_COMMIT_BRANCH)
+        - echo "[DEBUG] RELEASE_TAG_SHA1[$RELEASE_TAG_SHA1]"
         - git push
+        - release-cli create --name "Release $RELEASE_TAG" --tag-name "$RELEASE_TAG" --ref "$RELEASE_TAG_SHA1" --description "$RELEASE_CHANGELOG"
     after_script:
-        - cd ..
         - rm -Rf repo
-    release:
-        name: 'Release $TAG_NAME'
-        description: $RELEASE_CHANGELOG
-        tag_name: $RELEASE_TAG
-        ref: '$TAG_SHA1'
     rules:
+        - if: "$CI_COMMIT_AUTHOR =='NFC CI <CI@nfc-gitlab>'"
+          when: never
         - if: '$CI_COMMIT_BRANCH == "development"'
         - if: '$TRIGGER_RELEASE == "True" && $CI_COMMIT_BRANCH == "development"'
-          when: on_success
-          allow_failure: false
-        - if: '$CI_COMMIT_BRANCH == "issue-4"'
           when: on_success
           allow_failure: false
         - when: never
