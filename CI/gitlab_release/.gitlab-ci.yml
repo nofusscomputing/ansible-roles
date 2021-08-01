@@ -1,0 +1,51 @@
+Gitlab:
+    stage: release
+    image: registry.gitlab.com/gitlab-org/release-cli:latest
+    variables:
+        GIT_STRATEGY: none
+    before_script:
+        - apk update
+        - apk install --no-install-recommends -y git
+        - pip install --upgrade pip
+        - pip install -r ./CI/commitizen/requirements.txt
+        - git clone -b $target_branch gitlab-ci-token:$API_RO_GIT_WR@$CI_REPOSITORY_URL repo
+        - cd repo
+        - git remote rm origin
+        - git remote add origin $CI_REPOSITORY_URL
+        - git fetch --all
+        - git checkout --track origin/$CI_COMMIT_BRANCH
+#        - git clone before any cz command
+    script:
+        - VERSION_CURRENT=$(cz version --project)
+        - RELEASE_CHANGELOG=$(cz bump --changelog --changelog-to-stdout)
+        - git -d $RELEASE_TAG
+        - VERSION_NEW=$(cz version --project)
+        - RELEASE_TAG=v$VERSION_NEW
+        - echo "[DEBUG] VERSION_CURRENT[$VERSION_CURRENT]"
+        - echo "[DEBUG] RELEASE_CHANGELOG[$RELEASE_CHANGELOG]"
+        - echo "[DEBUG] VERSION_NEW[$VERSION_NEW]"
+        - echo "[DEBUG] RELEASE_TAG[$RELEASE_TAG]"
+        - TAG_SHA1=$(git log HEAD  --format=format:%H | tail -1)
+        - echo "[DEBUG] TAG_SHA1[$TAG_SHA1]"
+#        - echo Creating a release and git tag for release $RELEASE_TAG
+#        - cz changelog --unreleased-version="$RELEASE_TAG" --file-name="CHANGELOG.md"
+#        - push change to repo
+        - git push
+    after_script:
+        - cd ..
+        - rm -Rf repo
+    release:
+        name: 'Release $TAG_NAME'
+        description: $RELEASE_CHANGELOG
+        tag_name: $RELEASE_TAG
+        ref: '$TAG_SHA1'
+    rules:
+        - if: '$CI_COMMIT_BRANCH == "development"'
+        - if: '$TRIGGER_RELEASE == "True" && $CI_COMMIT_BRANCH == "development"'
+          when: on_success
+          allow_failure: false
+        - if: '$CI_COMMIT_BRANCH == "issue-4"'
+          when: on_success
+          allow_failure: false
+        - when: never
+
