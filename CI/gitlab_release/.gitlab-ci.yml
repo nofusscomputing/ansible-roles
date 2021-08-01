@@ -10,12 +10,17 @@ Gitlab:
         - python -m ensurepip  && ln -sf pip3 /usr/bin/pip
         - pip install --upgrade pip
         - pip install -r ./CI/commitizen/requirements.txt
-        - git clone -b $target_branch gitlab-ci-token:$API_RO_GIT_WR@$CI_REPOSITORY_URL repo
+        - target_branch=$(./CI/commitizen/scripts/commit.py --token $CI_JOB_TOKEN --project 28204898 --branch $CI_COMMIT_BRANCH --target-branch)
+        - echo "[DEBUG] Target Branch[$target_branch]"
+        - 'CLONE_URL="https://gitlab-ci-token:$API_RO_GIT_WR@gitlab.com/$CI_PROJECT_PATH.git"'
+        - echo "[DEBUG] CLONE_URL[$CLONE_URL]"
+        - git clone -b $CI_COMMIT_BRANCH $CLONE_URL repo
         - cd repo
         - git remote rm origin
         - git remote add origin $CI_REPOSITORY_URL
         - git fetch --all
-        - git checkout --track origin/$CI_COMMIT_BRANCH
+#        - git checkout --track origin/$CI_COMMIT_BRANCH
+        - git branch
 #        - git clone before any cz command
     script:
         - VERSION_CURRENT=$(cz version --project)
