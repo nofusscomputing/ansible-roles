@@ -17,4 +17,7 @@ pip install -r ./CI/ansible/requirements.txt
 echo "[DEBUG] install python requirements for commitizen"
 pip install -r ./CI/commitizen/requirements.txt
 
+echo "[DEBUG] install python module cz_nfc"
+pip install CI/gitlab_release/python-module/cz_nfc/.
+
 echo "Development environment setup. when you have completed development you can clear the python virtual environment by running the command 'deactivate'"
