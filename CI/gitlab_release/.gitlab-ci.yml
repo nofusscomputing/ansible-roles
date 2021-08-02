@@ -8,6 +8,7 @@ Gitlab:
         - python -m ensurepip  && ln -sf pip3 /usr/bin/pip
         - pip install --upgrade pip
         - pip install -r ./CI/gitlab_release/requirements.txt
+        - pip install CI/gitlab_release/python-module/cz_nfc/.
         - 'CLONE_URL="https://gitlab-ci-token:$API_RO_GIT_WR@gitlab.com/$CI_PROJECT_PATH.git"'
         - echo "[DEBUG] CLONE_URL[$CLONE_URL]"
         - git clone -b $CI_COMMIT_BRANCH $CLONE_URL repo
@@ -17,9 +18,9 @@ Gitlab:
         - git config --global user.name "NFC CI"
         - git push --set-upstream origin $CI_COMMIT_BRANCH
     script:
-        - RELEASE_VERSION_CURRENT=$(cz version --project)
-        - RELEASE_CHANGELOG=$(cz bump --changelog --changelog-to-stdout)
-        - RELEASE_VERSION_NEW=$(cz version --project)
+        - RELEASE_VERSION_CURRENT=$(cz -n cz_nfc version --project)
+        - RELEASE_CHANGELOG=$(cz -n cz_nfc bump --changelog --changelog-to-stdout)
+        - RELEASE_VERSION_NEW=$(cz -n cz_nfc version --project)
         - RELEASE_TAG=v$RELEASE_VERSION_NEW
         - git tag -d $RELEASE_TAG
         - echo "[DEBUG] RELEASE_VERSION_CURRENT[$RELEASE_VERSION_CURRENT]"
