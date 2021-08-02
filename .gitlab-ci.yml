@@ -1,11 +1,13 @@
 
 stages:
     - validation
+    - release
     - sync
 
 include:
   - local: CI/ansible/.gitlab-ci.yml
   - local: CI/commitizen/.gitlab-ci.yml
+  - local: CI/gitlab_release/.gitlab-ci.yml
 
 Github (Push --mirror):
     image: alpine:latest

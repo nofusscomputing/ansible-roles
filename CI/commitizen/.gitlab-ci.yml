@@ -9,9 +9,11 @@
         - python3 -m venv env
         - . env/bin/activate
         - pip install --upgrade pip
-        - pip install python-gitlab
-        - pip install commitizen
-        - target_branch=$(./CI/commitizen/scripts/commit.py --token $API_RO --project $CI_PROJECT_ID --branch $CI_COMMIT_BRANCH --target-branch)
+        - pip install -r ./CI/commitizen/requirements.txt
+        - echo "[DEBUG] CI_PROJECT_ID[$CI_PROJECT_ID]"
+        - echo "[DEBUG] CI_COMMIT_BRANCH[$CI_COMMIT_BRANCH]"
+        - target_branch=$(./CI/commitizen/scripts/commit.py --token $CI_JOB_TOKEN --project 28204898 --branch $CI_COMMIT_BRANCH --target-branch)
+
         - echo "[DEBUG] Target Branch[$target_branch]"
         - git clone --depth 150 -b $target_branch $CI_REPOSITORY_URL check
         - cd check
@@ -46,7 +48,7 @@ MR Title:
     extends:
         - .conventional_commit
     script:
-        - cz_exit=0 && cz check --message "$(./CI/commitizen/scripts/commit.py --token $API_RO --project $CI_PROJECT_ID --title --branch $CI_COMMIT_BRANCH)" > cz_output.log 2>&1 || cz_exit=$?
+        - cz_exit=0 && cz check --message "$(./CI/commitizen/scripts/commit.py --token $CI_JOB_TOKEN --project 28204898 --title --branch $CI_COMMIT_BRANCH)" > cz_output.log 2>&1 || cz_exit=$?
         - . ./CI/commitizen/scripts/cz_junit.sh > ../cz.junit.xml
 
 

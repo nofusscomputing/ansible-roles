@@ -1,0 +1,9 @@
+wheel 
+ansible
+setuptools_rust 
+Rust 
+ansible-lint
+yamllint
+lxml
+ansible-lint-junit
+ansible-lint-to-junit-xml

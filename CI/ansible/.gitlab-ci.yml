@@ -8,15 +8,7 @@
         - python3 -m venv env
         - . env/bin/activate
         - pip install --upgrade pip
-        - pip install wheel 
-        - pip install ansible
-        - pip install setuptools_rust 
-        - pip install Rust 
-        - pip3 install ansible-lint
-        - pip3 install yamllint
-        - pip install lxml
-#        - pip install ansible-lint-junit
-        - pip install ansible-lint-to-junit-xml
+        - pip install -r CI/ansible/requirements.txt
         - mkdir $PYTHON_VERSION
     script:
         - ansible-lint -p --nocolor --parseable-severity roles/ > $PYTHON_VERSION/ansible-lint.junit.log 1>&1 || ANSIBLE_LINT=$?
