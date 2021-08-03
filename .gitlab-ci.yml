@@ -4,10 +4,16 @@ stages:
     - release
     - sync
 
+variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+    MY_PROJECT_ID: "28204898"
+
+
 include:
   - local: CI/ansible/.gitlab-ci.yml
-  - local: CI/commitizen/.gitlab-ci.yml
+  - remote: https://gitlab.com/nofusscomputing/projects/gitlab-ci/-/raw/development/conventional_commits/.gitlab-ci.yml
   - local: CI/gitlab_release/.gitlab-ci.yml
+
 
 Github (Push --mirror):
     image: alpine:latest
