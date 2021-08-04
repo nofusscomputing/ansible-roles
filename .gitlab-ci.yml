@@ -11,7 +11,7 @@ variables:
 
 include:
   - remote: https://gitlab.com/nofusscomputing/projects/gitlab-ci/-/raw/development/conventional_commits/.gitlab-ci.yml
-  - local: CI/gitlab_release/.gitlab-ci.yml
+  - remote: https://gitlab.com/nofusscomputing/projects/gitlab-ci/-/raw/development/gitlab_release/.gitlab-ci.yml
   - remote: https://gitlab.com/nofusscomputing/projects/gitlab-ci/-/raw/development/git_push_mirror/.gitlab-ci.yml
   - remote: https://gitlab.com/nofusscomputing/projects/gitlab-ci/-/raw/development/ansible/.gitlab-ci.yml
 
