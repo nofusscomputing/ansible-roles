@@ -26,6 +26,11 @@ Ansible Lint (python 3.6):
     image: python:3.6-slim
 
 
+Gitlab Release:
+    extends:
+        - .gitlab_release
+
+
 Github (Push --mirror):
     variables:
         GIT_SYNC_URL: "https://$GITHUB_USERNAME_ROBOT:$GITHUB_TOKEN_ROBOT@github.com/NoFussComputing/gitlab-ci.git"
