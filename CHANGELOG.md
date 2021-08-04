@@ -1,3 +1,9 @@
+## v0.1.2rc2 (2021-08-04)
+
+### Continious Integration
+
+- **git_push_mirror**: [22b65543](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/commit/22b65543a6024e46dc9db6e9783322795b0414b7) - again fix git sync url. was missing '-roles'
+
 ## v0.1.2rc1 (2021-08-04)
 
 ### Continious Integration
