@@ -4,27 +4,29 @@ stages:
     - release
     - sync
 
+variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+    MY_PROJECT_ID: "28204898"
+
+
 include:
-  - local: CI/ansible/.gitlab-ci.yml
-  - local: CI/commitizen/.gitlab-ci.yml
-  - local: CI/gitlab_release/.gitlab-ci.yml
+  - remote: https://gitlab.com/nofusscomputing/projects/gitlab-ci/-/raw/development/conventional_commits/.gitlab-ci.yml
+  - remote: https://gitlab.com/nofusscomputing/projects/gitlab-ci/-/raw/development/gitlab_release/.gitlab-ci.yml
+  - remote: https://gitlab.com/nofusscomputing/projects/gitlab-ci/-/raw/development/git_push_mirror/.gitlab-ci.yml
+  - remote: https://gitlab.com/nofusscomputing/projects/gitlab-ci/-/raw/development/ansible/.gitlab-ci.yml
+
+
+Ansible Lint (python 3.6):
+    variables:
+        ANSIBLE_LINT_PATH: "roles/"
+    extends:
+        - .ansible_linter_defaults
+    image: python:3.6-slim
+
 
 Github (Push --mirror):
-    image: alpine:latest
-    stage: sync
-    before_script:
-        - apk update
-        - apk add git
-    script:
-        - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/$CI_PROJECT_PATH --mirror $CI_PROJECT_NAME
-        - cd $CI_PROJECT_NAME 
-        - git remote add github https://$GITHUB_USERNAME_ROBOT:$GITHUB_TOKEN_ROBOT@github.com/NoFussComputing/ansible-roles.git 
-        - echo "https://gitlab.com/ $CI_PROJECT_PATH / $CI_PROJECT_NAME .git"
-        - git push github --mirror
-    artifacts:
-        expire_in: 1 day
-    rules:
-      - if: '$CI_COMMIT_BRANCH == "master"'
-      - if: '$CI_COMMIT_BRANCH == "development"'
-        when: always
+    variables:
+        GIT_SYNC_URL: "https://$GITHUB_USERNAME_ROBOT:$GITHUB_TOKEN_ROBOT@github.com/NoFussComputing/gitlab-ci.git"
+    extends:
+        - .git_push_mirror
 
