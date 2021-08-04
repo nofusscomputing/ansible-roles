@@ -1,3 +1,9 @@
+## v0.1.2rc1 (2021-08-04)
+
+### Continious Integration
+
+- **git_push_mirror**: [2896a77e](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/commit/2896a77ee6f93da1e19b52c1a997c1e033e58ab7) - Sync to the correct git repo
+
 ## v0.1.2rc0 (2021-08-04)
 
 ### Continious Integration
