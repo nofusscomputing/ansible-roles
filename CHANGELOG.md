@@ -1,3 +1,18 @@
+## v0.1.2rc0 (2021-08-04)
+
+### Continious Integration
+
+- **gitlab-ci**: [03b58120](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/commit/03b5812077136bc720b95b72dc8d6c0bbe3726d7) - Use gitlab-ci gitlab_release
+- **gitlab-ci**: [295fe5b1](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/commit/295fe5b1dbf0923b4e456440ee88acacaaa8d8b3) - Update to use fixed ansible job
+- **ansible**: [c96a5173](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/commit/c96a517316a1c391abb17d8e376f16f3c0b6f48b) - Migrate to gitlab-ci ansible linting.
+- **git_push_mirror**: [a5a6d3d7](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/commit/a5a6d3d71e7112a195925f6f1ee79ec1ee40fda6) - User gitlab-ci job git_push_mirror
+- **gitlab-ci**: [2221ae4f](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/commit/2221ae4f22233008421356efa0eb55a596e64b86) - Migrate to gitlab-ci conventional_commits.
+- **gitlab-ci**: [e4703e09](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/commit/e4703e09a30a5945a186965f39940b548929b037) - Added gitlab-ci repo as submodule
+
+### Documentaton / Guides
+
+- **changelog**: [2c0ea4d1](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/commit/2c0ea4d1ba6e2da59cfb15dc2e61cfb237412d66) - updated changelog to use the new format
+
 ## v0.1.1 (2021-08-02)
 
 ### Documentaton / Guides
