@@ -1,0 +1,3 @@
+  dependencies:
+    - role: data_setup
+
