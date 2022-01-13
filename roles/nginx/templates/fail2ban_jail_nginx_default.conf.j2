@@ -1,0 +1,123 @@
+
+[DEFAULT]
+
+
+{{ DOCKER_CONTAINER_NAME_NGINX }}_error_log = {{ DIRECTORY_NGINX_LOGS }}/error*.log
+
+{{ DOCKER_CONTAINER_NAME_NGINX }}_access_log = {{ DIRECTORY_NGINX_LOGS }}/access*.log
+
+
+[nginx-http-auth]
+enabled = true
+port    = http,https
+logpath = %({{ DOCKER_CONTAINER_NAME_NGINX }}_error_log)s
+
+[nginx-limit-req]
+enabled = true
+logpath = %({{ DOCKER_CONTAINER_NAME_NGINX }}_error_log)s
+
+[nginx-botsearch]
+enabled = true
+logpath  = %({{ DOCKER_CONTAINER_NAME_NGINX }}_error_log)s
+
+[nginx-bad-request]
+enabled = true
+logpath = %({{ DOCKER_CONTAINER_NAME_NGINX }}_access_log)s
+
+
+
+
+
+
+
+
+
+
+
+
+
+[nginx-bad-request]
+chain = DOCKER-USER
+port    = http,https
+logpath = %(ingress_nginx_access_log)s
+enabled = false
+filter = nginx-bad-request
+#action = iptables[name=nginx-bad-request, port=multiport, protocol=tcp]
+findtime = 86400
+maxretry = 3
+bantime = 86400
+
+
+
+# To use more aggressive http-auth modes set filter parameter "mode" in jail.local:
+# normal (default), aggressive (combines all), auth or fallback
+# See "tests/files/logs/nginx-http-auth" or "filter.d/nginx-http-auth.conf" for usage example and details.
+
+[ingress-nginx-http-auth]
+# mode = normal
+chain = DOCKER-USER
+port    = http,https
+logpath = %(ingress_nginx_error_log)s
+enabled = true
+filter = nginx-http-auth
+#action = iptables[name=nginx-http-auth, port=ssh, protocol=tcp]
+findtime = 86400
+maxretry = 6
+bantime = 86400
+
+
+
+
+# To use 'nginx-limit-req' jail you should have `ngx_http_limit_req_module` 
+# and define `limit_req` and `limit_req_zone` as described in nginx documentation
+# http://nginx.org/en/docs/http/ngx_http_limit_req_module.html
+# or for example see in 'config/filter.d/nginx-limit-req.conf'
+
+
+
+
+
+[ingress-nginx-limit-req]
+chain = DOCKER-USER
+port    = http,https
+logpath = %(ingress_nginx_error_log)s
+enabled = true
+filter = nginx-limit-req
+#action = iptables[name=nginx-limit-req, port=multiport, protocol=tcp]
+findtime = 86400
+maxretry = 6
+bantime = 86400
+
+[ingress-nginx-botsearch]
+chain = DOCKER-USER
+port     = http,https
+logpath  = %(ingress_nginx_error_log)s
+enabled = true
+filter = nginx-botsearch
+#action = iptables[name=nginx-botsearch, port=multiport, protocol=tcp]
+findtime = 86400
+maxretry = 3
+bantime = 86400
+
+[ingress-nginx-http-401]
+chain = DOCKER-USER
+port    = http,https
+logpath = %(ingress_nginx_access_log)s
+enabled = true
+filter = http-401
+#action = iptables[name=ingress-nginx-http-401, port=multiport, protocol=tcp]
+#banaction = iptables-allports
+findtime = 86400
+maxretry = 4
+bantime = 86400
+
+[ingress-nginx-http-404]
+chain = DOCKER-USER
+port    = http,https
+logpath = %(ingress_nginx_access_log)s
+enabled = true
+filter = http-404-no_hostname
+findtime = 600
+maxretry = 3
+bantime = 86400
+
