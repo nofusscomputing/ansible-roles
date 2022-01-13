@@ -22,7 +22,7 @@ This ansible role is intended to be a dependency of other ansible roles. Each su
 
 | Variable Name | Default Value | Description |
 |:---|:---:|:---|
-| `directory_structure_root` | _None_ | This variable is a the root directory of where you would like to create the data directories. i.e. `/data` |
+| `directory_structure_root` | _None_ | **_Mandatory_**This variable is a the root directory of where you would like to create the data directories. i.e. `/data` |
 | `directory_structure_backup` | _`{{ directory_structure_root}}/backup`_ | This variable is a the root directory of where you would like to create the data directories. i.e. `/data` |
 | `directory_structure_config` | _`{{ directory_structure_root}}/config`_ | This variable is a the root directory of where you would like to create the data directories. i.e. `/data` |
 | `directory_structure_data` | _`{{ directory_structure_root}}/data`_ | This variable is a the root directory of where you would like to create the data directories. i.e. `/data` |

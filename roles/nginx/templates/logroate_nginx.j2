@@ -1,4 +1,4 @@
-{{ DIRECTORY_NGINX_LOGS }}/error*.log {
+{{ directory_nginx_logs }}/error*.log {
 	daily
 	missingok
 	rotate 7
@@ -10,7 +10,7 @@
 	notifempty
 }
 
-{{ DIRECTORY_NGINX_LOGS }}/access*.log {
+{{ directory_nginx_logs }}/access*.log {
 	daily
 	missingok
 	rotate 7

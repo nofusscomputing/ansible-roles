@@ -35,7 +35,6 @@
     docker_image:
       name: "{{ docker_image_nginx }}:{{ docker_image_nginx_tag }}"
       source: pull
-#    when: docker_installed is defined
     tags:
       - configure
       - install
@@ -47,7 +46,6 @@
       name: "{{ docker_network_nginx }}"
       internal: no
       state: present
-#    when: docker_installed is defined
     tags:
       - configure
       - install
