@@ -1,3 +1,28 @@
+## v0.1.2rc3 (2022-01-13)
+
+### Bug Fixes
+
+- **logrotate**: [ac1b17cc](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/commit/ac1b17cc64127db3c27681417a595f1a0cd73576) - stop and start service as required. [ [#2](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/issues/2) [!9](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/merge_requests/9) ]
+- **fail2ban**: [fa71d008](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/commit/fa71d00858e09d18716ca545d2c1d9dc5d4888da) - removed when condition as it's not required [ [#2](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/issues/2) [!9](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/merge_requests/9) ]
+
+### Code Refactor
+
+- [82b2e220](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/commit/82b2e22017d0fca05ac1ea83a3f551f01ed78a53) - code review suggestions
+- [71b5a1e8](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/commit/71b5a1e822253b51dd99578130ec86f7e0b238d6) - correct linting errors [ [!9](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/merge_requests/9) ]
+
+### Continious Integration
+
+- **gitlab-ci**: [0943ede7](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/commit/0943ede7e6fd1ef7184808c92f303b1433ccee03) - updated to latest commit on dev branch. [ [!6](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/merge_requests/6) ]
+- **gitlab-ci**: [d1e9c72b](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/commit/d1e9c72b8e56172182b199a2210dc6ac614bc4dd) - gitlab-ci.yml updated to use project import [ [#2](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/issues/2) ]
+
+### Features
+
+- **logrotate**: [96e73d6c](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/commit/96e73d6c28bf1a806592f9ddaef1c304a066a631) - add a handler to restart the service so config can be loaded. [ [#2](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/issues/2) [!9](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/merge_requests/9) ]
+- **nginx**: [1a2db8ba](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/commit/1a2db8bab4cdd10953b4943135c87d83ec741765) - added nginx role [ [#2](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/issues/2) [#7](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/issues/7) [!9](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/merge_requests/9) ]
+- **logrotate**: [8c6e8506](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/commit/8c6e8506534e5c6b1801e2580fe0d098c7a77430) - added ansible role logrotate [ [#2](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/issues/2) [!9](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/merge_requests/9) ]
+- **fail2ban**: [107b364a](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/commit/107b364a7990454ff5118abc711523609215e0b1) - added fail2ban role [ [#2](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/issues/2) [!9](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/merge_requests/9) ]
+- **data_setup**: [868c3391](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/commit/868c33917b84a1f991a67be0c35fd4399ce69ae8) - created role data_setup for creating data directories for roles [ [#2](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/issues/2) [!9](https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/merge_requests/9) ]
+
 ## v0.1.2rc2 (2021-08-04)
 
 ### Continious Integration
