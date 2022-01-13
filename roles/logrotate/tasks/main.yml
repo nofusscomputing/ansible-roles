@@ -1,5 +1,29 @@
 
-  - name: "Install logrotate"
+
+  - name: "Check if installed"
+    shell: |
+      dpkg -s logrotate
+    register: logrotate_installed
+    changed_when: False
+    failed_when: "fail2ban_installed.rc > 1"
+    tags:
+      - prepare
+      - configure
+      - install
+
+
+  - name: "Service - Stop if started"
+    service:
+      name: logrotate
+      state: stopped
+    when: ansible_os_family == "Debian" and logrotate_installed.rc == 0
+    changed_when: false
+    tags:
+      - configure
+      - install
+
+
+  - name: "Install"
     apt:
       name: "logrotate"
       state: present
@@ -10,7 +34,13 @@
       - install
 
 
-
-
-
+  - name: "Service - Start if started"
+    service:
+      name: fail2ban
+      state: started
+    when: ansible_os_family == "Debian" and fail2ban_installed.rc == 0
+    changed_when: false
+    tags:
+      - configure
+      - install
 
