@@ -1,5 +1,3 @@
-
-
   - name: "Check if installed"
     shell: |
       dpkg -s logrotate
@@ -43,4 +41,3 @@
     tags:
       - configure
       - install
-

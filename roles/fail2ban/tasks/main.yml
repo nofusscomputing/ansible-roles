@@ -1,7 +1,6 @@
-
   - name: "export default vars for playbook use"
     set_fact:
-      DIRECTORY_FAIL2BAN_CONFIG: "{{ DIRECTORY_FAIL2BAN_CONFIG }}"
+      directory_fail2ban_config: "{{ directory_fail2ban_config }}"
 
   - name: "Check if installed"
     shell: |
@@ -13,9 +12,9 @@
 
   - name: Download file with check (sha256)
     get_url:
-      url: "https://github.com/fail2ban/fail2ban/releases/download/{{ VERSION_FAIL2BAN }}/fail2ban_{{ VERSION_FAIL2BAN }}-1.upstream1_all.deb"
+      url: "https://github.com/fail2ban/fail2ban/releases/download/{{ version_fail2ban }}/fail2ban_{{ version_fail2ban }}-1.upstream1_all.deb"
       dest: "/tmp/fail2ban.deb"
-      checksum: "sha256:{{ FAIL2BAN_PACKAGE_SHA256 }}"
+      checksum: "sha256:{{ fail2ban_package_sha256 }}"
       mode: '0700'
       owner: root
 
@@ -48,5 +47,3 @@
     tags:
       - configure
       - install
-
-

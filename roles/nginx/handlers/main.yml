@@ -1,16 +1,8 @@
-
-
   - name: "Restart Nginx"
     docker_container:
-      name: "{{ DOCKER_CONTAINER_NAME_NGINX }}"
+      name: "{{ docker_container_name_nginx }}"
       state: started
       restart: yes
     tags:
       - configure
       - install
-
-
-
-
-
-

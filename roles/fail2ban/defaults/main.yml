@@ -1,5 +1,1 @@
-
-DIRECTORY_FAIL2BAN_CONFIG: /etc/fail2ban
-
-FAIL2BAN_PACKAGE_SHA256: 44fe3d67e7d24bba4fc81ee672059dcb67980258db6101bcd8740736a9d9110f
-
+directory_fail2ban_config: /etc/fail2ban

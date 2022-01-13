@@ -13,13 +13,13 @@ This ansible role is intended to be used as a dependency of other ansible roles.
 
 | Variable Name | Default Value | Description |
 |:---|:---:|:---|
-| `FAIL2BAN_PACKAGE_SHA256` | _None_ | The sha256 hash of the downloaded package. |
-| `VERSION_FAIL2BAN` | _None_ | This variable is the fail2ban version to install. See [releases](https://github.com/fail2ban/fail2ban/releases) for available version numbers |
+| `fail2ban_package_sha256` | _None_ | The sha256 hash of the downloaded package. |
+| `version_fail2ban` | _None_ | This variable is the fail2ban version to install. See [releases](https://github.com/fail2ban/fail2ban/releases) for available version numbers |
 
 
 ## Workflow
 
-1. export variable `DIRECTORY_FAIL2BAN_CONFIG` for other ansible role use.
+1. export variable `directory_fail2ban_config` for other ansible role use.
 
 1. download fail2ban deb package
 

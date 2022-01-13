@@ -3,7 +3,7 @@
 	missingok
 	rotate 7
 	postrotate
-		docker restart {{ DOCKER_CONTAINER_NAME_NGINX }}
+		docker restart {{ docker_container_name_nginx }}
 	endscript
 	compress
 	delaycompress
@@ -15,7 +15,7 @@
 	missingok
 	rotate 7
 	postrotate
-		docker restart {{ DOCKER_CONTAINER_NAME_NGINX }}
+		docker restart {{ docker_container_name_nginx }}
 	endscript
 	compress
 	delaycompress
