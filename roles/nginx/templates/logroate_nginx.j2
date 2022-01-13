@@ -1,0 +1,25 @@
+{{ directory_nginx_logs }}/error*.log {
+	daily
+	missingok
+	rotate 7
+	postrotate
+		docker restart {{ docker_container_name_nginx }}
+	endscript
+	compress
+	delaycompress
+	notifempty
+}
+
+{{ directory_nginx_logs }}/access*.log {
+	daily
+	missingok
+	rotate 7
+	postrotate
+		docker restart {{ docker_container_name_nginx }}
+	endscript
+	compress
+	delaycompress
+	notifempty
+}
+
+

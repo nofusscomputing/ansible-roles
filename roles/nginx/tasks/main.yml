@@ -1,0 +1,265 @@
+  - name: "export variables for use in other roles"
+    set_fact:
+      docker_nginx_config_root: "{{ docker_nginx_config_root }}"
+      docker_nginx_confd: "{{ docker_nginx_confd }}"
+      docker_nginx_http:  "{{ docker_nginx_http }}"
+      docker_nginx_ssl:  "{{ docker_nginx_ssl }}"
+      docker_nginx_logs:  "{{ docker_nginx_logs }}"
+    tags:
+      - configure
+      - install
+      - prepare
+
+
+  - name: "Create OS Group {{ docker_container_user_nginx }}"
+    group:
+      name: "{{ docker_container_user_nginx }}"
+      state: present
+    tags:
+      - configure
+      - install
+
+
+  - name: "Create OS User {{ docker_container_user_nginx }}"
+    user:
+      name: "{{ docker_container_user_nginx }}"
+      group: "{{ docker_container_user_nginx }}"
+      state: present
+      shell: "/bin/bash"
+    tags:
+      - configure
+      - install
+
+
+  - name: "Pull Docker Image {{ docker_image_nginx }}:{{ docker_image_nginx_tag }}"
+    docker_image:
+      name: "{{ docker_image_nginx }}:{{ docker_image_nginx_tag }}"
+      source: pull
+    tags:
+      - configure
+      - install
+      - prepare
+
+
+  - name: "Create Docker Network"
+    docker_network:
+      name: "{{ docker_network_nginx }}"
+      internal: no
+      state: present
+    tags:
+      - configure
+      - install
+
+
+  - name: Create Required Directories
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: "{{ docker_container_user_nginx }}"
+      group: "{{ docker_container_user_nginx }}"
+      mode: '0750'
+    with_items:
+      - "{{ docker_nginx_config_root }}"
+      - "{{ docker_nginx_confd }}"
+      - "{{ docker_nginx_http }}"
+      - "{{ docker_nginx_ssl }}"
+      - "{{ docker_nginx_logs }}"
+    tags:
+      - configure
+      - install
+
+
+#  - name: "fetch {{ docker_container_name_nginx }} uid"
+#    shell: |
+#      echo $(id -u ingress)
+#    changed_when: false
+#    register: nginx_uid
+
+
+  - name: Create Docker Container - [{{ docker_container_name_nginx }}] with published ports
+    docker_container:
+      name: "{{ docker_container_name_nginx }}"
+      image: "{{ docker_image_nginx }}:{{ docker_image_nginx_TAG }}"
+      memory: "{{ docker_container_nginx_memory }}"
+      cpuset_cpus: "{{ docker_container_nginx_cpu_set }}"
+      comparisons: 
+        '*': ignore
+        image: strict
+        env: strict
+        user: strict
+        published_ports: strict
+        volumes: allow_more_present
+        networks: allow_more_present
+      state: started
+      restart_policy: always
+      published_ports: "{{ docker_container_nginx_published_ports }}"
+      volumes:
+        - /etc/timezone:/etc/timezone:ro
+        - /etc/localtime:/etc/localtime:ro
+        - "{{ docker_nginx_confd }}:/etc/nginx/conf.d:ro"
+        - "{{ docker_nginx_ssl }}:/ssl-certs:ro"
+        - "{{ docker_nginx_logs }}:/var/log/nginx:rw"
+      networks_cli_compatible: yes
+      networks:
+        - name: "{{ docker_network_nginx }}"
+#      user: "{{ nginx_uid.stdout }}"
+    register: "docker_container_nginx"
+    when: docker_container_nginx_published_ports is defined
+    tags:
+      - install
+
+
+  - name: Create Docker Container - [{{ docker_container_name_nginx }}]
+    docker_container:
+      name: "{{ docker_container_name_nginx }}"
+      image: "{{ docker_image_nginx }}:{{ docker_image_nginx_TAG }}"
+      memory: "{{ docker_container_nginx_memory }}"
+      cpuset_cpus: "{{ docker_container_nginx_cpu_set }}"
+      comparisons: 
+        '*': ignore
+        image: strict
+        env: strict
+        user: strict
+        exposed_ports: strict
+        volumes: allow_more_present
+        networks: allow_more_present
+      state: started
+      restart_policy: always
+      exposed_ports: "{{ docker_container_nginx_exposed_ports }}"
+      volumes:
+        - /etc/timezone:/etc/timezone:ro
+        - /etc/localtime:/etc/localtime:ro
+        - "{{ docker_nginx_confd }}:/etc/nginx/conf.d:ro"
+        - "{{ docker_nginx_ssl }}:/ssl-certs:ro"
+        - "{{ docker_nginx_logs }}:/var/log/nginx:rw"
+      networks_cli_compatible: yes
+      networks:
+        - name: "{{ docker_network_nginx }}"
+#      user: "{{ nginx_uid.stdout }}"
+    register: "docker_container_nginx"
+    when: docker_container_nginx_published_ports is not defined
+    tags:
+      - install
+
+
+  - name: Default Configuration
+    template:
+      src: nginx_conf.d-default.conf.j2
+      dest: "{{ docker_nginx_confd }}/default.conf"
+      owner: "{{ docker_container_user_nginx }}"
+      group: "{{ docker_container_user_nginx }}"
+      mode: 0640
+    notify: "Restart Nginx"
+    tags:
+      - configure
+      - install
+
+
+  - name: "logrotate Configuration"
+    template:
+      src: logroate_nginx.j2
+      dest: "/etc/logrotate.d/nginx_{{ docker_container_name_nginx }}"
+      owner: root
+      mode: 0640
+      force: yes
+    tags:
+      - configure
+      - install
+
+
+  - name: "Fail2Ban Jail for {{ docker_container_name_nginx }}"
+    template:
+      src: fail2ban_jail_nginx_default.conf.j2
+      dest: "{{ directory_fail2ban_config }}/jail.d/nginx_{{ docker_container_name_nginx }}.local"
+      owner: root
+      mode: 0600
+      force: yes
+    notify: "Restart fail2ban"
+    tags:
+      - configure
+      - install
+
+
+#########################################
+# Remove the role
+#########################################
+
+  - name: Remove Docker Container - [{{ docker_container_name_nginx }}]
+    docker_container:
+      name: "{{ docker_container_name_nginx }}"
+      state: absent
+    tags:
+      - remove
+      - never
+
+
+  - name: "Remove OS User {{ docker_container_user_nginx }}"
+    user:
+      name: "{{ docker_container_user_nginx }}"
+      group: "{{ docker_container_user_nginx }}"
+      state: absent
+    tags:
+      - clean
+      - never
+
+
+  - name: "Remove OS Group {{ docker_container_user_nginx }}"
+    group:
+      name: "{{ docker_container_user_nginx }}"
+      state: absent
+    tags:
+      - clean
+      - never
+
+
+  - name: "Remove Docker Image {{ docker_image_nginx }}:{{ docker_image_nginx_tag }}"
+    docker_image:
+      name: "{{ docker_image_nginx }}:{{ docker_image_nginx_tag }}"
+      state: absent
+    tags:
+      - clean
+      - never
+
+
+  - name: "Remove Docker Network"
+    docker_network:
+      name: "{{ docker_network_nginx }}"
+      state: absent
+    tags:
+      - clean
+      - never
+
+
+  - name: Remove Directories
+    file:
+      path: "{{ item }}"
+      state: absent
+    with_items:
+      - "{{ docker_nginx_config_root }}"
+      - "{{ docker_nginx_confd }}"
+      - "{{ docker_nginx_http }}"
+      - "{{ docker_nginx_ssl }}"
+      - "{{ docker_nginx_logs }}"
+    tags:
+      - clean
+      - never
+
+  - name: "logrotate Configuration"
+    file:
+      path: "/etc/logrotate.d/nginx_{{ docker_container_name_nginx }}"
+      state: absent
+    tags:
+      - clean
+      - remove
+      - never
+
+
+  - name: "Fail2Ban Jail for {{ docker_container_name_nginx }}"
+    file:
+      path: "{{ directory_fail2ban_config }}/jail.d/nginx_{{ docker_container_name_nginx }}.local"
+      state: absent
+    notify: "Restart fail2ban"
+    tags:
+      - clean
+      - remove
+      - never
