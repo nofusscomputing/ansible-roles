@@ -3,7 +3,6 @@
     service:
       name: fail2ban
       state: restarted
-    when: fail2ban_install is defined or fail2ban_install.rc == 0
 
 
 
