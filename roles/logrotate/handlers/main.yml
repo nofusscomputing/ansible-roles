@@ -1,0 +1,11 @@
+
+  - name: "Restart fail2ban"
+    service:
+      name: logrotate
+      state: restarted
+
+
+
+
+
+
