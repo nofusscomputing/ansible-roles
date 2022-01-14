@@ -2,9 +2,9 @@
 [DEFAULT]
 
 
-{{ docker_container_name_nginx }}_error_log = {{ docker_nginx_logs }}/error*.log
+{{ docker_container_name_nginx }}_error_log = {{ directory_nginx_logs }}/error*.log
 
-{{ docker_container_name_nginx }}_access_log = {{ docker_nginx_logs }}/access*.log
+{{ docker_container_name_nginx }}_access_log = {{ directory_nginx_logs }}/access*.log
 
 
 [nginx-http-auth]
