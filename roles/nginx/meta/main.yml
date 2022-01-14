@@ -1,20 +1,20 @@
-galaxy_info:
-  role_name: nginx
-  author: No Fuss Computing
-  description: template role to create a docker container with nginx
+  galaxy_info:
+    role_name: nginx
+    author: No Fuss Computing
+    description: template role to create a docker container with nginx
 
-  issue_tracker_url: https://gitlab.com/nofusscomputing/infrastructure/ansible-roles
+    issue_tracker_url: https://gitlab.com/nofusscomputing/infrastructure/ansible-roles
 
-  license: https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/blob/master/LICENSE
+    license: https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/blob/master/LICENSE
 
-  min_ansible_version: 1.2
+    min_ansible_version: 1.2
 
-  platforms:
-    - name: Debian
-      versions:
-      - 10
+    platforms:
+      - name: Debian
+        versions:
+        - 10
 
-  galaxy_tags: [ nginx ]
+    galaxy_tags: [ nginx ]
 
   dependencies:
     - role: data_setup
