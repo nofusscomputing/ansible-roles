@@ -1,0 +1,22 @@
+server_tokens off;
+
+proxy_hide_header Server;
+
+proxy_hide_header X-Powered-By;
+
+
+server {
+
+    listen 80;
+
+    access_log  /var/log/nginx/access-default.log  main;
+    error_log  /var/log/nginx/error-default.log  main;
+
+    error_page   500 502 503 504  /50x.html;
+
+        location / {
+            return 404;
+        }
+
+}
+

@@ -1,0 +1,18 @@
+docker_container_name_nginx: "nginx"
+
+docker_nginx_config_root: "{{ directory_structure_config }}/{{ docker_container_name_nginx }}"
+docker_nginx_confd: "{{ directory_structure_config }}/{{ docker_container_name_nginx }}/conf.d"
+docker_nginx_http:  "{{ directory_structure_config }}/{{ docker_container_name_nginx }}/http"
+docker_nginx_ssl:  "{{ directory_structure_data }}/{{ docker_container_name_nginx }}/ssl"
+docker_nginx_logs:  "{{ directory_structure_logs }}/{{ docker_container_name_nginx }}"
+
+docker_container_nginx_cpu_set: 0:3
+
+docker_container_nginx_memory: 0
+docker_container_nginx_exposed_ports: [80, 443]
+
+docker_container_user_nginx: "{{ docker_container_name_nginx }}"
+
+docker_image_nginx: "nginx"
+
+docker_network_nginx: "{{ docker_container_name_nginx }}"

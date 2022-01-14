@@ -1,0 +1,54 @@
+  - name: Fetch Groups
+    shell: |
+      set -e -o pipefail
+      cat /etc/group | awk -F: '$3 >= 1000 && $3 != 65534 {print $1}'
+    args:
+      executable: "/bin/bash"
+    changed_when: false
+    register: existing_groups
+
+
+  - name: Remove extra Groups
+    user:
+      name: "{{ item }}"
+      state: absent
+      remove: yes
+    with_items: "{{ existing_groups.stdout_lines }}"
+    when: existing_groups is defined and groups_host is defined and item not in groups_host
+
+
+  - name: Add Groups
+    group:
+      name: "{{ item }}"
+      state: present
+    with_items: "{{ groups_host }}"
+    when: groups_host is defined
+
+
+  - name: Fetch Users
+    shell:  |
+      set -e -o pipefail
+      getent passwd | awk -F: '$3 >= 1000 && $3 != 65534 {print $1}'
+    args:
+      executable: "/bin/bash"
+    changed_when: false
+    register: existing_users
+
+
+  - name: Remove extra Users
+    user:
+      name: "{{ item }}"
+      state: absent
+      remove: yes
+    with_items: "{{ existing_users.stdout_lines }}"
+    when: users_host is defined and item not in users_host
+
+
+  - name: Users [Add]
+    user:
+      name: "{{ item }}"
+      state: present
+      group: users
+      shell: "/bin/bash"
+    with_items: "{{ users_host }}"
+    when: users_host is defined

@@ -1,0 +1,49 @@
+  - name: "export default vars for playbook use"
+    set_fact:
+      directory_fail2ban_config: "{{ directory_fail2ban_config }}"
+
+  - name: "Check if installed"
+    shell: |
+      dpkg -s fail2ban
+    register: fail2ban_installed
+    changed_when: False
+    failed_when: "fail2ban_installed.rc > 1"
+
+
+  - name: Download file with check (sha256)
+    get_url:
+      url: "https://github.com/fail2ban/fail2ban/releases/download/{{ version_fail2ban }}/fail2ban_{{ version_fail2ban }}-1.upstream1_all.deb"
+      dest: "/tmp/fail2ban.deb"
+      checksum: "sha256:{{ fail2ban_package_sha256 }}"
+      mode: '0700'
+      owner: root
+
+
+  - name: "Service - Stop if started"
+    service:
+      name: fail2ban
+      state: stopped
+    when: ansible_os_family == "Debian" and fail2ban_installed.rc == 0
+    changed_when: false
+    tags:
+      - configure
+      - install
+
+
+  - name: "Install deb package"
+    apt:
+      deb: "/tmp/fail2ban.deb"
+    register: fail2ban_install
+    when: ansible_os_family == "Debian"
+
+
+  - name: "Start and Enable Service"
+    service:
+      name: fail2ban
+      state: started
+      enabled: yes
+    changed_when: false
+    when: ansible_os_family == "Debian"
+    tags:
+      - configure
+      - install

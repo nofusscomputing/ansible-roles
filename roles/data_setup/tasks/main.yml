@@ -1,0 +1,25 @@
+  - name: "export default vars for playbook use"
+    set_fact:
+      directory_structure_backup: "{{ directory_structure_backup }}"
+      directory_structure_config: "{{ directory_structure_config }}"
+      directory_structure_data: "{{ directory_structure_data }}"
+      directory_structure_logs: "{{ directory_structure_logs }}"
+
+
+  - name: "Create a directory Structure"
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: root
+      group: root
+      mode: '0755'
+    with_items:
+      - "{{ directory_structure_root }}"
+      - "{{ directory_structure_backup }}"
+      - "{{ directory_structure_config }}"
+      - "{{ directory_structure_data }}"
+      - "{{ directory_structure_logs }}"
+    tags:
+      - configure
+      - install
+      - prepare

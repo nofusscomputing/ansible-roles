@@ -1,0 +1,4 @@
+directory_structure_backup: "{{ directory_structure_root }}/backup"
+directory_structure_config: "{{ directory_structure_root }}/config"
+directory_structure_data: "{{ directory_structure_root }}/data"
+directory_structure_logs: "{{ directory_structure_root }}/logs"

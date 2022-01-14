@@ -1,0 +1,18 @@
+galaxy_info:
+  role_name: fail2ban
+  author: No Fuss Computing
+  description: A role to install the specified github release tag for fail2ban
+
+  license: https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/blob/master/LICENSE
+
+  min_ansible_version: 1.2
+
+  platforms:
+    - name: Debian
+      versions:
+      - 10
+
+  galaxy_tags: [ fail2ban ]
+
+  dependencies:
+    - role: data_setup
