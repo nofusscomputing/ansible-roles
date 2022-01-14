@@ -1,3 +1,10 @@
+## v0.1.5 (2022-01-14)
+
+### Bug Fixes
+
+- **nginx**: [8a14b31f](https://gitlab.com/nofusscomputing/projects/ansible-roles/-/commit/8a14b31fc45e2efee29b850d7e259ed31e510d1b) - correct variable name 'docker_nginx_*' to 'directory_ngnx_*' [ [!15](https://gitlab.com/nofusscomputing/projects/ansible-roles/-/merge_requests/15) ]
+- **nginx**: [2a6c3f05](https://gitlab.com/nofusscomputing/projects/ansible-roles/-/commit/2a6c3f058fbec7ae47818166934816078cdf003c) - fix typo in var name docker_image_nginx_tag [ [!15](https://gitlab.com/nofusscomputing/projects/ansible-roles/-/merge_requests/15) ]
+
 ## v0.1.4 (2022-01-14)
 
 ### Code Refactor
