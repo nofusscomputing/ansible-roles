@@ -164,6 +164,7 @@
       owner: root
       mode: 0640
       force: yes
+    notify: "Restart logrotate"
     tags:
       - configure
       - install
@@ -250,6 +251,7 @@
     file:
       path: "/etc/logrotate.d/nginx_{{ docker_container_name_nginx }}"
       state: absent
+    notify: "Restart logrotate"
     tags:
       - clean
       - remove
