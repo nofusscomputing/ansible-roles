@@ -1,3 +1,9 @@
+## v0.1.4 (2022-01-14)
+
+### Code Refactor
+
+- [a8aa6005](https://gitlab.com/nofusscomputing/projects/ansible-roles/-/commit/a8aa600513d399a1860496bed3b2854eac90c644) - incorrect tabbing for galaxy_info [ [!13](https://gitlab.com/nofusscomputing/projects/ansible-roles/-/merge_requests/13) ]
+
 ## v0.1.3 (2022-01-14)
 
 ### Bug Fixes
