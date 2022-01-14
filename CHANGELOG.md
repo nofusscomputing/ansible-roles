@@ -1,3 +1,24 @@
+## v0.1.2 (2022-01-14)
+
+### Bug Fixes
+
+- **nginx**: [ed2d6172](https://gitlab.com/nofusscomputing/projects/ansible-roles/-/commit/ed2d6172c77d4c9b5662d4b59bef8469d5eed534) - ensure any config changes to logrotate trigger a restart of logrotate. [ [!6](https://gitlab.com/nofusscomputing/projects/ansible-roles/-/merge_requests/6) ]
+- **logrotate**: [262a1ac1](https://gitlab.com/nofusscomputing/projects/ansible-roles/-/commit/262a1ac19d878dc40134dbe364fa62c6d186b1fd) - incorrect name used in roles [ [!6](https://gitlab.com/nofusscomputing/projects/ansible-roles/-/merge_requests/6) ]
+- **nginx**: [f667b238](https://gitlab.com/nofusscomputing/projects/ansible-roles/-/commit/f667b2384240d5d3dbadec3b8c7d8f913bf264f2) - mount http directory within container so that files can be served if configured to. [ [#8](https://gitlab.com/nofusscomputing/projects/ansible-roles/-/issues/8) [!10](https://gitlab.com/nofusscomputing/projects/ansible-roles/-/merge_requests/10) ]
+
+### Continious Integration
+
+- **gitlab-ci**: [3c32c226](https://gitlab.com/nofusscomputing/projects/ansible-roles/-/commit/3c32c226d307ccf399421939d6d15655f4a81683) - update to latest commit '9cd94c124c8076f72cde698a52cad15dbbe4a576' [ [!10](https://gitlab.com/nofusscomputing/projects/ansible-roles/-/merge_requests/10) ]
+
+### Documentaton / Guides
+
+- **readme**: [0007a896](https://gitlab.com/nofusscomputing/projects/ansible-roles/-/commit/0007a896cc7f88e6df9f3931d7c925a8419395ec) - fix link to point to correct role. [ [!6](https://gitlab.com/nofusscomputing/projects/ansible-roles/-/merge_requests/6) ]
+- **README**: [dd77a818](https://gitlab.com/nofusscomputing/projects/ansible-roles/-/commit/dd77a818675c6f3a1dcc059f1149e67a34f0be15) - added repo usage and explaination. [ [!10](https://gitlab.com/nofusscomputing/projects/ansible-roles/-/merge_requests/10) ]
+
+### Features
+
+- **users_groups**: [7be070f5](https://gitlab.com/nofusscomputing/projects/ansible-roles/-/commit/7be070f52e9114b960c0ebcecdc17ecf82b2f7ef) - added new role [ [#2](https://gitlab.com/nofusscomputing/projects/ansible-roles/-/issues/2) [!10](https://gitlab.com/nofusscomputing/projects/ansible-roles/-/merge_requests/10) ]
+
 ## v0.1.2rc3 (2022-01-13)
 
 ### Bug Fixes
