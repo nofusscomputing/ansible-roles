@@ -79,7 +79,7 @@
   - name: Create Docker Container - [{{ docker_container_name_nginx }}] with published ports
     docker_container:
       name: "{{ docker_container_name_nginx }}"
-      image: "{{ docker_image_nginx }}:{{ docker_image_nginx_TAG }}"
+      image: "{{ docker_image_nginx }}:{{ docker_image_nginx_tag }}"
       memory: "{{ docker_container_nginx_memory }}"
       cpuset_cpus: "{{ docker_container_nginx_cpu_set }}"
       comparisons: 
@@ -113,7 +113,7 @@
   - name: Create Docker Container - [{{ docker_container_name_nginx }}]
     docker_container:
       name: "{{ docker_container_name_nginx }}"
-      image: "{{ docker_image_nginx }}:{{ docker_image_nginx_TAG }}"
+      image: "{{ docker_image_nginx }}:{{ docker_image_nginx_tag }}"
       memory: "{{ docker_container_nginx_memory }}"
       cpuset_cpus: "{{ docker_container_nginx_cpu_set }}"
       comparisons: 
