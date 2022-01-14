@@ -1,10 +1,10 @@
   - name: "export variables for use in other roles"
     set_fact:
-      docker_nginx_config_root: "{{ docker_nginx_config_root }}"
-      docker_nginx_confd: "{{ docker_nginx_confd }}"
-      docker_nginx_http:  "{{ docker_nginx_http }}"
-      docker_nginx_ssl:  "{{ docker_nginx_ssl }}"
-      docker_nginx_logs:  "{{ docker_nginx_logs }}"
+      directory_nginx_config_root: "{{ directory_nginx_config_root }}"
+      directory_nginx_confd: "{{ directory_nginx_confd }}"
+      directory_nginx_http:  "{{ directory_nginx_http }}"
+      directory_nginx_ssl:  "{{ directory_nginx_ssl }}"
+      directory_nginx_logs:  "{{ directory_nginx_logs }}"
     tags:
       - configure
       - install
@@ -59,11 +59,11 @@
       group: "{{ docker_container_user_nginx }}"
       mode: '0750'
     with_items:
-      - "{{ docker_nginx_config_root }}"
-      - "{{ docker_nginx_confd }}"
-      - "{{ docker_nginx_http }}"
-      - "{{ docker_nginx_ssl }}"
-      - "{{ docker_nginx_logs }}"
+      - "{{ directory_nginx_config_root }}"
+      - "{{ directory_nginx_confd }}"
+      - "{{ directory_nginx_http }}"
+      - "{{ directory_nginx_ssl }}"
+      - "{{ directory_nginx_logs }}"
     tags:
       - configure
       - install
@@ -96,10 +96,10 @@
       volumes:
         - /etc/timezone:/etc/timezone:ro
         - /etc/localtime:/etc/localtime:ro
-        - "{{ docker_nginx_confd }}:/etc/nginx/conf.d:ro"
-        - "{{ docker_nginx_http }}:/http:ro"
-        - "{{ docker_nginx_ssl }}:/ssl-certs:ro"
-        - "{{ docker_nginx_logs }}:/var/log/nginx:rw"
+        - "{{ directory_nginx_confd }}:/etc/nginx/conf.d:ro"
+        - "{{ directory_nginx_http }}:/http:ro"
+        - "{{ directory_nginx_ssl }}:/ssl-certs:ro"
+        - "{{ directory_nginx_logs }}:/var/log/nginx:rw"
       networks_cli_compatible: yes
       networks:
         - name: "{{ docker_network_nginx }}"
@@ -130,10 +130,10 @@
       volumes:
         - /etc/timezone:/etc/timezone:ro
         - /etc/localtime:/etc/localtime:ro
-        - "{{ docker_nginx_confd }}:/etc/nginx/conf.d:ro"
-        - "{{ docker_nginx_http }}:/http:ro"
-        - "{{ docker_nginx_ssl }}:/ssl-certs:ro"
-        - "{{ docker_nginx_logs }}:/var/log/nginx:rw"
+        - "{{ directory_nginx_confd }}:/etc/nginx/conf.d:ro"
+        - "{{ directory_nginx_http }}:/http:ro"
+        - "{{ directory_nginx_ssl }}:/ssl-certs:ro"
+        - "{{ directory_nginx_logs }}:/var/log/nginx:rw"
       networks_cli_compatible: yes
       networks:
         - name: "{{ docker_network_nginx }}"
@@ -147,7 +147,7 @@
   - name: Default Configuration
     template:
       src: nginx_conf.d-default.conf.j2
-      dest: "{{ docker_nginx_confd }}/default.conf"
+      dest: "{{ directory_nginx_confd }}/default.conf"
       owner: "{{ docker_container_user_nginx }}"
       group: "{{ docker_container_user_nginx }}"
       mode: 0640
@@ -238,11 +238,11 @@
       path: "{{ item }}"
       state: absent
     with_items:
-      - "{{ docker_nginx_config_root }}"
-      - "{{ docker_nginx_confd }}"
-      - "{{ docker_nginx_http }}"
-      - "{{ docker_nginx_ssl }}"
-      - "{{ docker_nginx_logs }}"
+      - "{{ directory_nginx_config_root }}"
+      - "{{ directory_nginx_confd }}"
+      - "{{ directory_nginx_http }}"
+      - "{{ directory_nginx_ssl }}"
+      - "{{ directory_nginx_logs }}"
     tags:
       - clean
       - never
