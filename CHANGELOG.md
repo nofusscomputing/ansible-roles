@@ -1,3 +1,9 @@
+## v0.1.3 (2022-01-14)
+
+### Bug Fixes
+
+- **logrotate**: [ffce7487](https://gitlab.com/nofusscomputing/projects/ansible-roles/-/commit/ffce7487c90dbcec232f0634737439dc9862ff2e) - conditional check collision with redefining variables. [ [!11](https://gitlab.com/nofusscomputing/projects/ansible-roles/-/merge_requests/11) [!12](https://gitlab.com/nofusscomputing/projects/ansible-roles/-/merge_requests/12) ]
+
 ## v0.1.2 (2022-01-14)
 
 ### Bug Fixes
