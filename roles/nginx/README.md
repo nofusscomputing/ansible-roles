@@ -8,7 +8,7 @@ This ansible role is intended to be used as a dependency of other ansible roles.
 
 - [data_setup](../data_setup)
 
-- [fail2ban](../logrotate)
+- [fail2ban](../fail2ban)
 
 - [logrotate](../logrotate)
 
