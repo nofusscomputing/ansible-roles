@@ -97,6 +97,7 @@
         - /etc/timezone:/etc/timezone:ro
         - /etc/localtime:/etc/localtime:ro
         - "{{ docker_nginx_confd }}:/etc/nginx/conf.d:ro"
+        - "{{ docker_nginx_http }}:/http:ro"
         - "{{ docker_nginx_ssl }}:/ssl-certs:ro"
         - "{{ docker_nginx_logs }}:/var/log/nginx:rw"
       networks_cli_compatible: yes
@@ -130,6 +131,7 @@
         - /etc/timezone:/etc/timezone:ro
         - /etc/localtime:/etc/localtime:ro
         - "{{ docker_nginx_confd }}:/etc/nginx/conf.d:ro"
+        - "{{ docker_nginx_http }}:/http:ro"
         - "{{ docker_nginx_ssl }}:/ssl-certs:ro"
         - "{{ docker_nginx_logs }}:/var/log/nginx:rw"
       networks_cli_compatible: yes
