@@ -1,0 +1,21 @@
+    galaxy_info:
+    role_name: Secure apt
+    author: No Fuss Computing
+    description: template role to install the componets required for secure APT
+
+    issue_tracker_url: https://gitlab.com/nofusscomputing/infrastructure/ansible-roles
+
+    license: https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/blob/master/LICENSE
+
+    min_ansible_version: 1.2
+
+    platforms:
+      - name: Debian
+        versions:
+        - 10
+
+    galaxy_tags: [ secureAPT ]
+
+#  dependencies:
+#    - role: secure_apt
+
