@@ -1,4 +1,4 @@
-    galaxy_info:
+  galaxy_info:
     role_name: docker
     author: No Fuss Computing
     description: template role to install docker on a host
