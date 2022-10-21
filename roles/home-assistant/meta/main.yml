@@ -1,0 +1,21 @@
+  galaxy_info:
+    role_name: homeassistant
+    author: No Fuss Computing
+    description: template role to create a docker container with Home Assistant
+
+    issue_tracker_url: https://gitlab.com/nofusscomputing/infrastructure/ansible-roles
+
+    license: https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/blob/master/LICENSE
+
+    min_ansible_version: 1.2
+
+    platforms:
+      - name: Debian
+        versions:
+        - 10
+
+    galaxy_tags: [ nginx ]
+
+  dependencies:
+    - role: data_setup
+#    - role: logrotate
