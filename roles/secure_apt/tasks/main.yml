@@ -1,4 +1,3 @@
-
   - name: "Install packages - Required for apt over HTTPS"
     apt:
       name: "{{ packages }}"
@@ -16,4 +15,3 @@
       - configure
       - install
       - prepare
-
