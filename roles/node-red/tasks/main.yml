@@ -1,0 +1,236 @@
+  - name: "export variables for use in other roles"
+    set_fact:
+      directory_nodered_config_root: "{{ directory_nodered_config_root }}"
+      directory_nodered_logs:  "{{ directory_nodered_logs }}"
+    tags:
+      - configure
+      - install
+      - prepare
+
+
+  - name: "Create OS Group {{ docker_container_user_nodered }}"
+    group:
+      name: "{{ docker_container_user_nodered }}"
+      state: present
+    tags:
+      - configure
+      - install
+
+
+  - name: "Create OS User {{ docker_container_user_nodered }}"
+    user:
+      name: "{{ docker_container_user_nodered }}"
+      group: "{{ docker_container_user_nodered }}"
+      state: present
+      shell: "/bin/bash"
+    tags:
+      - configure
+      - install
+
+
+  - name: "Pull Docker Image {{ docker_image_nodered }}:{{ docker_image_nodered_tag }}"
+    docker_image:
+      name: "{{ docker_image_nodered }}:{{ docker_image_nodered_tag }}"
+      source: pull
+    tags:
+      - configure
+      - install
+      - prepare
+
+
+  - name: "Create Docker Network"
+    docker_network:
+      name: "{{ docker_network_nodered }}"
+      internal: no
+      state: present
+    tags:
+      - configure
+      - install
+
+
+  - name: Create Required Directories
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: "{{ docker_container_user_nodered }}"
+      group: "{{ docker_container_user_nodered }}"
+      mode: '0750'
+    with_items:
+      - "{{ directory_nodered_config_root }}"
+      - "{{ directory_nodered_logs }}"
+    tags:
+      - configure
+      - install
+
+
+  - name: Create Docker Container - [{{ docker_container_name_nodered }}] with published ports
+    docker_container:
+      name: "{{ docker_container_name_nodered }}"
+      image: "{{ docker_image_nodered }}:{{ docker_image_nodered_tag }}"
+      memory: "{{ docker_container_nodered_memory }}"
+      cpuset_cpus: "{{ docker_container_nodered_cpu_set }}"
+      comparisons: 
+        '*': ignore
+        image: strict
+        env: strict
+        user: strict
+        published_ports: strict
+        volumes: allow_more_present
+        networks: allow_more_present
+      state: started
+      restart_policy: always
+      published_ports: "{{ docker_container_nodered_published_ports }}"
+      volumes:
+        - /etc/timezone:/etc/timezone:ro
+        - /etc/localtime:/etc/localtime:ro
+        - "{{ directory_nodered_config_root }}:/config"
+#        - "{{ directory_nodered_logs }}:/var/log/nginx:rw"
+      networks_cli_compatible: yes
+      networks:
+        - name: "{{ docker_network_nodered }}"
+#      user: "{{ nginx_uid.stdout }}"
+    register: "docker_container_nodered"
+    when: docker_container_nodered_published_ports is defined
+    tags:
+      - install
+
+
+  - name: Create Docker Container - [{{ docker_container_name_nodered }}]
+    docker_container:
+      name: "{{ docker_container_name_nodered }}"
+      image: "{{ docker_image_nodered }}:{{ docker_image_nodered_tag }}"
+      memory: "{{ docker_container_nodered_memory }}"
+      cpuset_cpus: "{{ docker_container_nodered_cpu_set }}"
+      comparisons: 
+        '*': ignore
+        image: strict
+        env: strict
+        user: strict
+        exposed_ports: strict
+        volumes: allow_more_present
+        networks: allow_more_present
+      state: started
+      restart_policy: always
+      exposed_ports: "{{ docker_container_nodered_exposed_ports }}"
+      volumes:
+        - /etc/timezone:/etc/timezone:ro
+        - /etc/localtime:/etc/localtime:ro
+        - "{{ directory_nodered_config_root }}:/config"
+#        - "{{ directory_nodered_logs }}:/var/log/nginx:rw"
+      networks_cli_compatible: yes
+      networks:
+        - name: "{{ docker_network_nodered }}"
+#      user: "{{ nginx_uid.stdout }}"
+    register: "docker_container_nodered"
+    when: docker_container_nodered_published_ports is not defined
+    tags:
+      - install
+
+
+#  - name: "logrotate Configuration"
+#    template:
+#      src: logroate_nginx.j2
+#      dest: "/etc/logrotate.d/nodered_{{ docker_container_name_nodered }}"
+#      owner: root
+#      mode: 0640
+#      force: yes
+#    notify: "Restart logrotate"
+#    tags:
+#      - configure
+#      - install
+
+
+#  - name: "Fail2Ban Jail for {{ docker_container_name_nginx }}"
+#    template:
+#      src: fail2ban_jail_nginx_default.conf.j2
+#      dest: "{{ directory_fail2ban_config }}/jail.d/nginx_{{ docker_container_name_nginx }}.local"
+#      owner: root
+#      mode: 0600
+#      force: yes
+#    notify: "Restart fail2ban"
+#    tags:
+#      - configure
+#      - install
+
+
+#########################################
+# Remove the role
+#########################################
+
+  - name: Remove Docker Container - [{{ docker_container_name_nodered }}]
+    docker_container:
+      name: "{{ docker_container_name_nodered }}"
+      state: absent
+    tags:
+      - remove
+      - never
+
+
+  - name: "Remove OS User {{ docker_container_user_nodered }}"
+    user:
+      name: "{{ docker_container_user_nodered }}"
+      group: "{{ docker_container_user_nodered }}"
+      state: absent
+    tags:
+      - clean
+      - never
+
+
+  - name: "Remove OS Group {{ docker_container_user_nodered }}"
+    group:
+      name: "{{ docker_container_user_nodered }}"
+      state: absent
+    tags:
+      - clean
+      - never
+
+
+  - name: "Remove Docker Image {{ docker_image_nodered }}:{{ docker_image_nnodered_tag }}"
+    docker_image:
+      name: "{{ docker_image_nodered }}:{{ docker_image_nodered_tag }}"
+      state: absent
+    tags:
+      - clean
+      - never
+
+
+  - name: "Remove Docker Network"
+    docker_network:
+      name: "{{ docker_network_nodered }}"
+      state: absent
+    tags:
+      - clean
+      - never
+
+
+  - name: Remove Directories
+    file:
+      path: "{{ item }}"
+      state: absent
+    with_items:
+      - "{{ directory_nodered_config_root }}"
+      - "{{ directory_nodered_logs }}"
+    tags:
+      - clean
+      - never
+
+  - name: "logrotate Configuration"
+    file:
+      path: "/etc/logrotate.d/nodered_{{ docker_container_name_nodered }}"
+      state: absent
+    notify: "Restart logrotate"
+    tags:
+      - clean
+      - remove
+      - never
+
+
+#  - name: "Fail2Ban Jail for {{ docker_container_name_nginx }}"
+#    file:
+#      path: "{{ directory_fail2ban_config }}/jail.d/nginx_{{ docker_container_name_nginx }}.local"
+#      state: absent
+#    notify: "Restart fail2ban"
+#    tags:
+#      - clean
+#      - remove
+#      - never

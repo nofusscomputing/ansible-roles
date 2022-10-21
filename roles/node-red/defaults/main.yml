@@ -1,0 +1,15 @@
+docker_container_name_nodered: "node_red"
+
+directory_nodered_config_root: "{{ directory_structure_config }}/{{ docker_container_name_nodered }}"
+directory_nodered_logs:  "{{ directory_structure_logs }}/{{ docker_container_name_nodered }}"
+
+docker_container_nginx_cpu_set: 0:3
+
+docker_container_nodered_memory: 0
+docker_container_nodered_exposed_ports: [ 1880 ]
+
+docker_container_user_nodered: "{{ docker_container_name_nodered }}"
+
+docker_image_nodered: "nodered/node-red"
+
+docker_network_nodered: "{{ docker_container_name_nodered }}"
