@@ -84,7 +84,7 @@
         - /etc/timezone:/etc/timezone:ro
         - /etc/localtime:/etc/localtime:ro
         - "{{ directory_homeassistant_config_root }}:/config"
-        - "{{ directory_homeassistant_logs }}:/var/log/nginx:rw"
+#        - "{{ directory_homeassistant_logs }}:/var/log/nginx:rw"
       networks_cli_compatible: yes
       networks:
         - name: "{{ docker_network_homeassistant }}"
@@ -116,28 +116,28 @@
         - /etc/timezone:/etc/timezone:ro
         - /etc/localtime:/etc/localtime:ro
         - "{{ directory_homeassistant_config_root }}:/config"
-        - "{{ directory_homeassistant_logs }}:/var/log/nginx:rw"
+#        - "{{ directory_homeassistant_logs }}:/var/log/nginx:rw"
       networks_cli_compatible: yes
       networks:
         - name: "{{ docker_network_homeassistant }}"
 #      user: "{{ nginx_uid.stdout }}"
-    register: "docker_container_nginx"
+    register: "docker_container_homeassistant"
     when: docker_container_homeassistant_published_ports is not defined
     tags:
       - install
 
 
-  - name: "logrotate Configuration"
-    template:
-      src: logroate_nginx.j2
-      dest: "/etc/logrotate.d/homeassistant_{{ docker_container_name_homeassistant }}"
-      owner: root
-      mode: 0640
-      force: yes
-    notify: "Restart logrotate"
-    tags:
-      - configure
-      - install
+#  - name: "logrotate Configuration"
+#    template:
+#      src: logroate_nginx.j2
+#      dest: "/etc/logrotate.d/homeassistant_{{ docker_container_name_homeassistant }}"
+#      owner: root
+#      mode: 0640
+#      force: yes
+#    notify: "Restart logrotate"
+#    tags:
+#      - configure
+#      - install
 
 
 #  - name: "Fail2Ban Jail for {{ docker_container_name_nginx }}"
