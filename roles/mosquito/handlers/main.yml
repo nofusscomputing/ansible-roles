@@ -1,0 +1,8 @@
+  - name: "Restart mosquitto"
+    docker_container:
+      name: "{{ docker_container_name_mosquitto }}"
+      state: started
+      restart: yes
+    tags:
+      - configure
+      - install
