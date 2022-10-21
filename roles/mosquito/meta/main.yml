@@ -18,4 +18,5 @@
 
   dependencies:
     - role: data_setup
+    - role: docker
 #    - role: logrotate
