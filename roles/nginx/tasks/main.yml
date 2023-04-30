@@ -30,6 +30,16 @@
       - configure
       - install
 
+  - name: add ansible user to {{ docker_container_user_nginx }}
+    user:
+      name: "{{ ansible_user }}"
+      state: present
+      groups: "{{ docker_container_user_nginx }}"
+      append: yes
+    tags:
+      - configure
+      - install
+      - host
 
   - name: "Pull Docker Image {{ docker_image_nginx }}:{{ docker_image_nginx_tag }}"
     docker_image:
