@@ -67,7 +67,7 @@
       state: directory
       owner: "{{ docker_container_user_nginx }}"
       group: "{{ docker_container_user_nginx }}"
-      mode: '0750'
+      mode: '6760'
     with_items:
       - "{{ directory_nginx_config_root }}"
       - "{{ directory_nginx_confd }}"
