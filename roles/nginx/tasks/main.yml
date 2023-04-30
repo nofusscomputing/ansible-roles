@@ -166,17 +166,19 @@
       - install
 
 
-  - name: Default Configuration
+  - name: nginx host configuration
     template:
-      src: nginx_conf.d-default.conf.j2
-      dest: "{{ directory_nginx_confd }}/default.conf"
+      src: nginx_conf.d-host.conf.j2
+      dest: "{{ directory_nginx_confd }}/host-{{ item.name }}.conf"
       owner: "{{ docker_container_user_nginx }}"
       group: "{{ docker_container_user_nginx }}"
       mode: 0640
     notify: "Restart Nginx"
+    with_items: "{{ nginx_hosts_config }}"
     tags:
       - configure
       - install
+      - host
 
 
   - name: "logrotate Configuration"
