@@ -30,6 +30,16 @@
       - configure
       - install
 
+  - name: add ansible user to {{ docker_container_user_nginx }}
+    user:
+      name: "{{ ansible_user }}"
+      state: present
+      groups: "{{ docker_container_user_nginx }}"
+      append: yes
+    tags:
+      - configure
+      - install
+      - host
 
   - name: "Pull Docker Image {{ docker_image_nginx }}:{{ docker_image_nginx_tag }}"
     docker_image:
@@ -57,17 +67,29 @@
       state: directory
       owner: "{{ docker_container_user_nginx }}"
       group: "{{ docker_container_user_nginx }}"
-      mode: '0750'
+      mode: '6760'
     with_items:
       - "{{ directory_nginx_config_root }}"
       - "{{ directory_nginx_confd }}"
-      - "{{ directory_nginx_http }}"
       - "{{ directory_nginx_ssl }}"
       - "{{ directory_nginx_logs }}"
     tags:
       - configure
       - install
 
+  - name: Create http Directories
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: "{{ docker_container_user_nginx }}"
+      group: "{{ docker_container_user_nginx }}"
+      mode: '6771'
+    with_items:
+      - "{{ directory_nginx_http }}"
+    tags:
+      - configure
+      - install
+      - host
 
 #  - name: "fetch {{ docker_container_name_nginx }} uid"
 #    shell: |
@@ -144,17 +166,19 @@
       - install
 
 
-  - name: Default Configuration
+  - name: nginx host configuration
     template:
-      src: nginx_conf.d-default.conf.j2
-      dest: "{{ directory_nginx_confd }}/default.conf"
+      src: nginx_conf.d-host.conf.j2
+      dest: "{{ directory_nginx_confd }}/host-{{ item.name }}.conf"
       owner: "{{ docker_container_user_nginx }}"
       group: "{{ docker_container_user_nginx }}"
       mode: 0640
     notify: "Restart Nginx"
+    with_items: "{{ nginx_hosts_config }}"
     tags:
       - configure
       - install
+      - host
 
 
   - name: "logrotate Configuration"
