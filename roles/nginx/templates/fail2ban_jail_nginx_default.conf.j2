@@ -2,27 +2,27 @@
 [DEFAULT]
 
 
-{{ docker_container_name_nginx }}_error_log = {{ directory_nginx_logs }}/error*.log
+{{ docker_container_name_nginx }}_nginx_error_log = {{ directory_nginx_logs }}/error*.log
 
-{{ docker_container_name_nginx }}_access_log = {{ directory_nginx_logs }}/access*.log
+{{ docker_container_name_nginx }}_nginx_access_log = {{ directory_nginx_logs }}/access*.log
 
 
 [nginx-http-auth]
 enabled = true
 port    = http,https
-logpath = %({{ docker_container_name_nginx }}_error_log)s
+logpath = %({{ docker_container_name_nginx }}_nginx_rror_log)s
 
 [nginx-limit-req]
 enabled = true
-logpath = %({{ docker_container_name_nginx }}_error_log)s
+logpath = %({{ docker_container_name_nginx }}_nginx_error_log)s
 
 [nginx-botsearch]
 enabled = true
-logpath  = %({{ docker_container_name_nginx }}_error_log)s
+logpath  = %({{ docker_container_name_nginx }}_nginx_error_log)s
 
 [nginx-bad-request]
 enabled = true
-logpath = %({{ docker_container_name_nginx }}_access_log)s
+logpath = %({{ docker_container_name_nginx }}_nginx_access_log)s
 
 
 
@@ -36,7 +36,7 @@ logpath = %({{ docker_container_name_nginx }}_access_log)s
 
 
 
-[nginx-bad-request]
+[ingress-nginx-bad-request]
 chain = DOCKER-USER
 port    = http,https
 logpath = %(ingress_nginx_access_log)s
