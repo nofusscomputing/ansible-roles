@@ -10,7 +10,7 @@
 [nginx-http-auth]
 enabled = true
 port    = http,https
-logpath = %({{ docker_container_name_nginx }}_nginx_rror_log)s
+logpath = %({{ docker_container_name_nginx }}_nginx_error_log)s
 
 [nginx-limit-req]
 enabled = true
