@@ -71,13 +71,25 @@
     with_items:
       - "{{ directory_nginx_config_root }}"
       - "{{ directory_nginx_confd }}"
-      - "{{ directory_nginx_http }}"
       - "{{ directory_nginx_ssl }}"
       - "{{ directory_nginx_logs }}"
     tags:
       - configure
       - install
 
+  - name: Create http Directories
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: "{{ docker_container_user_nginx }}"
+      group: "{{ docker_container_user_nginx }}"
+      mode: '6771'
+    with_items:
+      - "{{ directory_nginx_http }}"
+    tags:
+      - configure
+      - install
+      - host
 
 #  - name: "fetch {{ docker_container_name_nginx }} uid"
 #    shell: |
