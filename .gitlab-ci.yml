@@ -6,6 +6,8 @@ stages:
 
 variables:
     GIT_SUBMODULE_STRATEGY: recursive
+    GIT_SYNC_URL: "https://$GITHUB_USERNAME_ROBOT:$GITHUB_TOKEN_ROBOT@github.com/NoFussComputing/ansible-roles.git"
+    
     MY_PROJECT_ID: "28204898"
     NFC_GITLAB_SUBMODULE_HASH: '$(git submodule status --recursive | awk "{print $$1}")'
     NFC_GITLAB_CI_URL: "https://gitlab.com/nofusscomputing/projects/gitlab-ci/-/raw/$NFC_GITLAB_SUBMODULE_HASH"
@@ -35,8 +37,6 @@ Gitlab Release:
 
 
 Github (Push --mirror):
-    variables:
-        GIT_SYNC_URL: "https://$GITHUB_USERNAME_ROBOT:$GITHUB_TOKEN_ROBOT@github.com/NoFussComputing/ansible-roles.git"
     extends:
         - .git_push_mirror
 
