@@ -1,0 +1,16 @@
+docker_container_name_mosquitto: "mosquitto"
+
+directory_mosquitto_config: "{{ directory_structure_config }}/{{ docker_container_name_mosquitto }}"
+directory_mosquitto_data: "{{ directory_structure_data }}/{{ docker_container_name_mosquitto }}"
+directory_mosquitto_logs:  "{{ directory_structure_logs }}/{{ docker_container_name_mosquitto }}"
+
+docker_container_nginx_cpu_set: 0:3
+
+docker_container_mosquitto_memory: 0
+docker_container_mosquitto_exposed_ports: [ 1880 ]
+
+docker_container_user_mosquitto: "{{ docker_container_name_mosquitto }}"
+
+docker_image_mosquitto: "eclipse-mosquitto"
+
+docker_network_mosquitto: "{{ docker_container_name_mosquitto }}"

@@ -1,0 +1,14 @@
+/var/lib/docker/containers/*/*.log {
+	daily
+	missingok
+	rotate 7
+	compress
+	delaycompress
+	notifempty
+	postrotate
+		docker restart $(docker ps -q)
+	endscript
+}
+
+
+

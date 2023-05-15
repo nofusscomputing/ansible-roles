@@ -1,0 +1,15 @@
+docker_container_name_homeassistant: "home_assistant"
+
+directory_homeassistant_config_root: "{{ directory_structure_config }}/{{ docker_container_name_homeassistant }}"
+directory_homeassistant_logs:  "{{ directory_structure_logs }}/{{ docker_container_name_homeassistant }}"
+
+docker_container_nginx_cpu_set: 0:3
+
+docker_container_homeassistant_memory: 0
+docker_container_homeassistant_exposed_ports: [ 8123 ]
+
+docker_container_user_homeassistant: "{{ docker_container_name_homeassistant }}"
+
+docker_image_homeassistant: "homeassistant/home-assistant"
+
+docker_network_homeassistant: "{{ docker_container_name_homeassistant }}"
