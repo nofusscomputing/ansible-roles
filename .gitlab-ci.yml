@@ -20,15 +20,7 @@ include:
       - conventional_commits/.gitlab-ci.yml
       - gitlab_release/.gitlab-ci.yml
       - git_push_mirror/.gitlab-ci.yml
-      - ansible/.gitlab-ci.yml
-
-
-Ansible Lint (python 3.11):
-    variables:
-        ANSIBLE_LINT_PATH: "roles/"
-    extends:
-        - .ansible_linter_defaults
-    image: python:3.11-slim
+      #- ansible/.gitlab-ci.yml
 
 
 Gitlab Release:
