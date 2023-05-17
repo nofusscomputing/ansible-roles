@@ -46,6 +46,4 @@ ansible-ee Container:
       when: never
     - if: '$CI_COMMIT_BRANCH == "development"'
       when: on_success
-    - if: '$CI_COMMIT_BRANCH != "master"'
-      when: manual
     - when: never
