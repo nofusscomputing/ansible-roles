@@ -39,6 +39,8 @@ ansible-ee Container:
   trigger:
     project: nofusscomputing/projects/ansible/execution_environment
     branch: development
+    forward:
+      yaml_variables: false
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: never
