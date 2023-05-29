@@ -1,9 +1,12 @@
+---
 
-stages:
-    - validation
-    - release
-    - sync
-    - publish
+include:
+  - project: nofusscomputing/projects/gitlab-ci
+    ref: development
+    file:
+      - .gitlab-ci_common.yaml
+      - template/automagic.gitlab-ci.yaml
+
 
 variables:
     GIT_SUBMODULE_STRATEGY: recursive
@@ -12,26 +15,6 @@ variables:
     MY_PROJECT_ID: "28204898"
     NFC_GITLAB_SUBMODULE_HASH: '$(git submodule status --recursive | awk "{print $$1}")'
     NFC_GITLAB_CI_URL: "https://gitlab.com/nofusscomputing/projects/gitlab-ci/-/raw/$NFC_GITLAB_SUBMODULE_HASH"
-
-
-include:
-  - project: nofusscomputing/projects/gitlab-ci
-    ref: development
-    file:
-      - conventional_commits/.gitlab-ci.yml
-      - gitlab_release/.gitlab-ci.yml
-      - git_push_mirror/.gitlab-ci.yml
-      #- ansible/.gitlab-ci.yml
-
-
-Gitlab Release:
-    extends:
-        - .gitlab_release
-
-
-Github (Push --mirror):
-    extends:
-        - .git_push_mirror
 
 
 ansible-ee Container:
@@ -46,6 +29,6 @@ ansible-ee Container:
       when: never
     - if: $CI_COMMIT_TAG
       when: never
-    - if: '$CI_COMMIT_BRANCH == "development"'
+    - if: '$CI_COMMIT_BRANCH == "development" && $CI_PIPELINE_SOURCE == "push"'
       when: on_success
     - when: never
