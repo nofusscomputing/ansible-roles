@@ -3,6 +3,6 @@
 	url = https://gitlab.com/nofusscomputing/projects/gitlab-ci.git
 	branch = development
 [submodule "roles/git_configuration"]
-	path = roles/git_configuration
+	path = git_configuration
 	url = https://gitlab.com/nofusscomputing/projects/ansible/git_configuration.git
 	branch = development
