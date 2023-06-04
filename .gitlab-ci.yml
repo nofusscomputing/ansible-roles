@@ -21,4 +21,9 @@ Ansible.Execution_Environment.Submodule.Deploy:
   extends: .submodule_update_trigger
   variables:
     SUBMODULE_UPDATE_TRIGGER_PROJECT: nofusscomputing/projects/ansible/execution_environment
-    GIT_CONFIG_SUBMODULE_NAME: $CI_PROJECT_NAME
+
+
+Config.Submodule.Deploy:
+  extends: .submodule_update_trigger
+  variables:
+    SUBMODULE_UPDATE_TRIGGER_PROJECT: nofusscomputing/infrastructure/config
