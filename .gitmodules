@@ -6,3 +6,7 @@
 	path = git_configuration
 	url = https://gitlab.com/nofusscomputing/projects/ansible/git_configuration.git
 	branch = development
+[submodule "docker_management"]
+	path = docker_management
+	url = https://gitlab.com/nofusscomputing/projects/ansible/docker_management.git
+	branch = development
