@@ -1,6 +1,7 @@
 {{ directory_nginx_logs }}/error*.log {
 	daily
 	missingok
+	su ingress ingress
 	rotate 7
 	postrotate
 		docker restart {{ docker_container_name_nginx }}
@@ -13,6 +14,7 @@
 {{ directory_nginx_logs }}/access*.log {
 	daily
 	missingok
+	su ingress ingress
 	rotate 7
 	postrotate
 		docker restart {{ docker_container_name_nginx }}
