@@ -18,5 +18,6 @@
 
   dependencies:
     - role: data_setup
-    - role: fail2ban
-    - role: logrotate
+    # - role: fail2ban
+    # - role: logrotate
+    # - role: docker

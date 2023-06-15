@@ -41,24 +41,23 @@
       - install
       - host
 
-  - name: "Pull Docker Image {{ docker_image_nginx }}:{{ docker_image_nginx_tag }}"
-    docker_image:
-      name: "{{ docker_image_nginx }}:{{ docker_image_nginx_tag }}"
-      source: pull
+
+  - name: pull docker image and Configure networks
+    include_role:
+      name: docker_management
+    vars:
+      docker_images:
+        - name: "{{ docker_image_nginx }}"
+          tag: "{{ docker_image_nginx_tag }}"
+          source: pull
+      docker_networks:
+        - name: "{{ docker_network_nginx }}"
+          # internal: no # not yet available in the docker role
+          state: present
     tags:
       - configure
       - install
       - prepare
-
-
-  - name: "Create Docker Network"
-    docker_network:
-      name: "{{ docker_network_nginx }}"
-      internal: no
-      state: present
-    tags:
-      - configure
-      - install
 
 
   - name: Create Required Directories
@@ -78,13 +77,14 @@
       - configure
       - install
 
+
   - name: Create http Directories
     file:
       path: "{{ item }}"
       state: directory
       owner: "{{ docker_container_user_nginx }}"
       group: "{{ docker_container_user_nginx }}"
-      mode: '6771'
+      mode: '6775'
       recurse: yes
     with_items:
       - "{{ directory_nginx_http }}"
@@ -100,72 +100,107 @@
 #    register: nginx_uid
 
 
-  - name: Create Docker Container - [{{ docker_container_name_nginx }}] with published ports
-    docker_container:
-      name: "{{ docker_container_name_nginx }}"
-      image: "{{ docker_image_nginx }}:{{ docker_image_nginx_tag }}"
-      memory: "{{ docker_container_nginx_memory }}"
-      cpuset_cpus: "{{ docker_container_nginx_cpu_set }}"
-      comparisons: 
-        '*': ignore
-        image: strict
-        env: strict
-        user: strict
-        published_ports: strict
-        volumes: allow_more_present
-        networks: allow_more_present
-      state: started
-      restart_policy: always
-      published_ports: "{{ docker_container_nginx_published_ports }}"
-      volumes:
-        - /etc/timezone:/etc/timezone:ro
-        - /etc/localtime:/etc/localtime:ro
-        - "{{ directory_nginx_confd }}:/etc/nginx/conf.d:ro"
-        - "{{ directory_nginx_http }}:/http:ro"
-        - "{{ directory_nginx_ssl }}:/ssl-certs:ro"
-        - "{{ directory_nginx_logs }}:/var/log/nginx:rw"
-      networks_cli_compatible: yes
-      networks:
-        - name: "{{ docker_network_nginx }}"
-#      user: "{{ nginx_uid.stdout }}"
-    register: "docker_container_nginx"
-    when: docker_container_nginx_published_ports is defined
+  # - name: Create Docker Container - [{{ docker_container_name_nginx }}] with published ports
+  #   docker_container:
+  #     name: "{{ docker_container_name_nginx }}"
+  #     image: "{{ docker_image_nginx }}:{{ docker_image_nginx_tag }}"
+  #     memory: "{{ docker_container_nginx_memory }}"
+  #     cpuset_cpus: "{{ docker_container_nginx_cpu_set }}"
+  #     comparisons: 
+  #       '*': ignore
+  #       image: strict
+  #       env: strict
+  #       user: strict
+  #       published_ports: strict
+  #       volumes: allow_more_present
+  #       networks: allow_more_present
+  #     state: started
+  #     restart_policy: always
+  #     published_ports: "{{ docker_container_nginx_published_ports }}"
+  #     volumes:
+  #       - /etc/timezone:/etc/timezone:ro
+  #       - /etc/localtime:/etc/localtime:ro
+  #       - "{{ directory_nginx_confd }}:/etc/nginx/conf.d:ro"
+  #       - "{{ directory_nginx_http }}:/http:ro"
+  #       - "{{ directory_nginx_ssl }}:/ssl-certs:ro"
+  #       - "{{ directory_nginx_logs }}:/var/log/nginx:rw"
+  #     networks_cli_compatible: yes
+  #     networks:
+  #       - name: "{{ docker_network_nginx }}"
+  #     user: "{{ nginx_uid.stdout }}"
+  #   register: "docker_container_nginx"
+  #   when: docker_container_nginx_published_ports is defined
+  #   tags:
+  #     - install
+
+
+  - name: "Create Docker Container"
+    include_role:
+      name: docker_management
+    vars:
+      docker_containers:
+        - name: "{{ docker_container_name_nginx }}"
+          image: "{{ docker_image_nginx }}:{{ docker_image_nginx_tag }}"
+          memory: "{{ docker_container_nginx_memory }}"
+          cpuset_cpus: "{{ docker_container_nginx_cpu_set }}"
+          comparisons: 
+            image: strict
+            env: strict
+            user: strict
+            published_ports: strict
+            volumes: allow_more_present
+            networks: allow_more_present
+            '*': ignore
+          state: started
+          restart_policy: always
+          published_ports: "{{ docker_container_nginx_published_ports }}"
+          volumes:
+            - /etc/timezone:/etc/timezone:ro
+            - /etc/localtime:/etc/localtime:ro
+            - "{{ directory_nginx_confd }}:/etc/nginx/conf.d:ro"
+            - "{{ directory_nginx_http }}:/http:ro"
+            - "{{ directory_nginx_ssl }}:/ssl-certs:ro"
+            - "{{ directory_nginx_logs }}:/var/log/nginx:rw"
+          networks_cli_compatible: yes
+          networks:
+            - name: "{{ docker_network_nginx }}"
+          #user: "{{ nginx_uid.stdout }}"
     tags:
       - install
 
 
-  - name: Create Docker Container - [{{ docker_container_name_nginx }}]
-    docker_container:
-      name: "{{ docker_container_name_nginx }}"
-      image: "{{ docker_image_nginx }}:{{ docker_image_nginx_tag }}"
-      memory: "{{ docker_container_nginx_memory }}"
-      cpuset_cpus: "{{ docker_container_nginx_cpu_set }}"
-      comparisons: 
-        '*': ignore
-        image: strict
-        env: strict
-        user: strict
-        exposed_ports: strict
-        volumes: allow_more_present
-        networks: allow_more_present
-      state: started
-      restart_policy: always
-      exposed_ports: "{{ docker_container_nginx_exposed_ports }}"
-      volumes:
-        - /etc/timezone:/etc/timezone:ro
-        - /etc/localtime:/etc/localtime:ro
-        - "{{ directory_nginx_confd }}:/etc/nginx/conf.d:ro"
-        - "{{ directory_nginx_http }}:/http:ro"
-        - "{{ directory_nginx_ssl }}:/ssl-certs:ro"
-        - "{{ directory_nginx_logs }}:/var/log/nginx:rw"
-      networks_cli_compatible: yes
-      networks:
-        - name: "{{ docker_network_nginx }}"
-#      user: "{{ nginx_uid.stdout }}"
-    register: "docker_container_nginx"
-    when: docker_container_nginx_published_ports is not defined
-    tags:
-      - install
+  # - name: Create Docker Container - [{{ docker_container_name_nginx }}]
+  #   docker_container:
+  #     name: "{{ docker_container_name_nginx }}"
+  #     image: "{{ docker_image_nginx }}:{{ docker_image_nginx_tag }}"
+  #     memory: "{{ docker_container_nginx_memory }}"
+  #     cpuset_cpus: "{{ docker_container_nginx_cpu_set }}"
+  #     comparisons: 
+  #       '*': ignore
+  #       image: strict
+  #       env: strict
+  #       user: strict
+  #       exposed_ports: strict
+  #       volumes: allow_more_present
+  #       networks: allow_more_present
+  #     state: started
+  #     restart_policy: always
+  #     exposed_ports: "{{ docker_container_nginx_exposed_ports }}"
+  #     volumes:
+  #       - /etc/timezone:/etc/timezone:ro
+  #       - /etc/localtime:/etc/localtime:ro
+  #       - "{{ directory_nginx_confd }}:/etc/nginx/conf.d:ro"
+  #       - "{{ directory_nginx_http }}:/http:ro"
+  #       - "{{ directory_nginx_ssl }}:/ssl-certs:ro"
+  #       - "{{ directory_nginx_logs }}:/var/log/nginx:rw"
+  #     networks_cli_compatible: yes
+  #     networks:
+  #       - name: "{{ docker_network_nginx }}"
+  #     user: "{{ nginx_uid.stdout }}"
+  #   register: "docker_container_nginx"
+  #   when: docker_container_nginx_published_ports is not defined
+  #   tags:
+  #     - install
 
 
   - name: nginx host configuration
