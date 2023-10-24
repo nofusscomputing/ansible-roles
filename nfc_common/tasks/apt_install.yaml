@@ -1,0 +1,36 @@
+---
+# ToDo: check if package not already installed
+- name: Install package
+  ansible.builtin.apt:
+    name: "{% if item.version is defined and item.version | default('') != '' %}{{ item.name }}={{ item.version }}{% else %}{{ item.name }}{% endif %}"
+    state: "{{ item.state | default('present') }}"
+    update_cache: true
+    #install_recommends: false
+    allow_downgrade: true
+    autoremove: true
+  with_items: "{{ [ aptInstall ] | community.general.lists_mergeby(hostConfig.aptPackages|default(''), 'name', list_merge='replace') }}"
+  run_once: true
+
+
+# ToDo: check if the package is not already in use
+- name: Prevent auto-update of package
+  ansible.builtin.dpkg_selections:
+    name: "{{ item.name }}"
+    selection: "{% if item.version is defined %}hold{% else %}install{% endif %}"
+  with_items: "{{ [ aptInstall ] | community.general.lists_mergeby(hostConfig.aptPackages|default(''), 'name', list_merge='replace') }}"
+  run_once: true
+  when: item.state is not defined
+
+
+- name: Set service state for apps with configured service settings
+  ansible.builtin.service:
+    name: "{{ item.service.name | default(item.name) }}"
+    state: "{{ item.service.state }}"
+    enabled: "{{ item.service.enabled | default('no') }}"
+  with_items: "{{ [ aptInstall ] | community.general.lists_mergeby(hostConfig.aptPackages|default(''), 'name', list_merge='replace') }}"
+  when: item.service is defined
+
+
+- name: Clear task variables
+  ansible.builtin.set_fact:
+    aptInstall: []
