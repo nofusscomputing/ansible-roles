@@ -10,3 +10,11 @@
 	path = docker_management
 	url = https://gitlab.com/nofusscomputing/projects/ansible/docker_management.git
 	branch = development
+[submodule "nfc_firewall"]
+	path = nfc_firewall
+	url = https://gitlab.com/nofusscomputing/projects/ansible/firewall.git
+	branch = development
+[submodule "nfc_kubernetes"]
+	path = nfc_kubernetes
+	url = https://gitlab.com/nofusscomputing/projects/ansible/kubernetes.git
+	branch = development
