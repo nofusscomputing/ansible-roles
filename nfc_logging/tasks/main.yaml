@@ -1,0 +1,35 @@
+---
+- name: Install Log Rotate
+  ansible.builtin.include_tasks:
+    file: install.yaml
+    apply:
+      tags:
+        - always
+  tags:
+    - always
+  when: >
+    install_logrotate | bool
+      and
+    not logrotate_installed | default(false) | bool
+      and
+    ansible_os_family == "Debian"
+
+
+- name: Configure Log Rotate
+  ansible.builtin.include_tasks:
+    file: configure.yaml
+    apply:
+      tags:
+        - always
+  tags:
+    - always
+  when: >
+    install_logrotate | bool
+      and
+    ansible_os_family == "Debian"
+      and
+    (
+      logrotate is defined
+        and
+      logrotate | default([]) | length | int > 0
+    )
