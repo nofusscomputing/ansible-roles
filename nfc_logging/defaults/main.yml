@@ -1,0 +1,21 @@
+---
+directory_logrotate_config: /etc/logrotate.d
+install_logrotate: 'true'
+logfile_max_size: 10 # must be specified in MB (Mega Bytes)
+logrotate_configuration: [] # Global var for usage within group/host vars
+
+# Configuration Example
+# logrotate:
+#   - name: docker                                   # Mandatory, used as logrotate difinition file name
+#     path: '/var/lib/docker/containers/*/*.log'     # Mandatory, path to the logfile
+#     su: ingress ingress                            # Optional,, string user and group for log permissions
+#     interval: daily                                # optional example daily, weekly, monthly default=daily
+#     keep:                                          # Optional, int, How many logs to keep default=7
+#     size: 10                                       # Optional, max size of logfile in Mega Bytes. DONT specify unit. default={{}}
+#     compress:                                      # Optional, bool default=true
+#     delaycompress:                                 # Optional, bool, delay logfile compression default=true
+#     postrotate: 'docker restart $(docker ps -q)'   # Optional, Command to run post rotate default=not defined
+#     create:                                        # Optional, default=not defined
+#       mode: 640                                    # Mandatory, filemode
+#       owner: root                                  # Mandatory, logfile owner
+#       group: adm                                   # Mandatory, logfile group owner

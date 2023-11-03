@@ -1,0 +1,51 @@
+---
+- name: Check if installed
+  ansible.builtin.command:
+    cmd: dpkg -s logrotate
+  register: logrotate_install_check
+  changed_when: false
+  failed_when: logrotate_install_check.rc > 1
+  no_log: true
+
+
+- name: Task playbook variables
+  ansible.builtin.set_fact:
+    logrotate_installed: "{% if logrotate_install_check.rc | default(1) | int == 0 %}true{% else %}false{% endif %}"
+
+
+- name: Install
+  ansible.builtin.apt:
+    name: logrotate
+    state: present
+    update_cache: true
+    install_recommends: false
+  # register: logrotate_installed
+  when: install_logrotate | bool
+
+
+- name: Start and enable log rotate service
+  ansible.builtin.service:
+    name: logrotate
+    state: started
+    enabled: true
+  when: >
+    install_logrotate | bool
+      and
+    ansible_os_family == "Debian"
+      and
+    not logrotate_installed | bool
+  changed_when: false
+
+
+- name: Confirm log rotate installed
+  ansible.builtin.command:
+    cmd: dpkg -s logrotate
+  register: logrotate_install_check
+  changed_when: false
+  failed_when: logrotate_install_check.rc > 1
+  no_log: true
+
+
+- name: Task Final playbook variables
+  ansible.builtin.set_fact:
+    logrotate_installed: "{% if logrotate_install_check.rc | default(1) | int == 0 %}true{% else %}false{% endif %}"
