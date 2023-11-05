@@ -1,0 +1,28 @@
+galaxy_info:
+  role_name: nfc_ssh
+  author: No Fuss Computing
+  description: |-
+    A universal role to install and configure SSH Server.
+
+    This role is also desiged so that it can be included within other roles.
+
+  issue_tracker_url: https://gitlab.com/nofusscomputing/infrastructure/ansible-roles
+
+  license: https://gitlab.com/nofusscomputing/infrastructure/ansible-roles/-/blob/master/LICENSE
+
+  min_ansible_version: '1.2'
+
+  # platforms:
+  #   - name: Debian
+  #     versions:
+  #     - "11"
+
+  galaxy_tags:
+    - ssh
+    - sshd
+    - openssh
+    - config
+    - networking
+
+dependencies:
+  - role: nfc_common

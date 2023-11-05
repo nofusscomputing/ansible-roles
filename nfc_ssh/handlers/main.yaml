@@ -1,0 +1,7 @@
+---
+- name: "Restart OpenSSH-Server"
+  ansible.builtin.service:
+    name: sshd
+    state: restarted
+  listen: 'restart_openssh_server'
+  when: openssh_server_installed | bool

@@ -1,0 +1,194 @@
+---
+
+- name: Fetch Certificate/Key Details
+  ansible.builtin.include_tasks:
+    file: ssh_key/details.yaml
+
+
+- name: Create Host Keys
+  ansible.builtin.include_tasks:
+    file: ssh_key/create.yaml
+
+
+- name: Sign Host Public Key
+  ansible.builtin.include_tasks:
+    file: ssh_key/sign.yaml
+
+
+- name: Fetch Certificate/Key Details
+  ansible.builtin.include_tasks:
+    file: ssh_key/details.yaml
+
+
+- name: Add Details to play stats 
+  ansible.builtin.include_tasks:
+    file: ssh_key/stats.yaml
+
+
+
+- name: Confirm Key Exist
+  ansible.builtin.stat:
+    path: /etc/ssh/ssh_host_ed25519_key
+  register: ssh_host_key
+
+
+- name: Confirm Signed Certificates Exist
+  ansible.builtin.stat:
+    path: /etc/ssh/ssh_host_ed25519_key-cert.pub
+  register: ssh_host_signed_cert
+
+
+- name: Collect SSH Certificate Details
+  ansible.builtin.command:
+    cmd: ssh-keygen -L -f /etc/ssh/ssh_host_ed25519_key-cert.pub
+  become: true
+  changed_when: false
+  register: signed_cert_details
+  when: ssh_host_signed_cert.stat.exists
+
+
+- name: Parse Certificate for validity dates
+  ansible.builtin.set_fact:
+    cert_details: |-
+      {%- for line in signed_cert_details.stdout_lines -%}
+        {%- if 'valid: from' in (line | trim | lower) -%}
+        {
+        "date_from": "{{ ((((((line | trim | lower) | split('to'))[0]) | split('from'))[1]) | split('t'))[0] | trim }}",
+        "date_to": "{{ (((line | trim | lower) | split('to'))[1] | split('t'))[0] | trim }}"
+        }
+        {%- endif -%}
+      {%- endfor %}
+  when: ssh_host_signed_cert.stat.exists
+
+
+- name: Create facts with certificate validity dates
+  ansible.builtin.set_fact:
+    date_from: "{{ (cert_details | from_yaml).date_from }}"
+    date_to: "{{ (cert_details | from_yaml).date_to }}"
+    duration_remaining: >-
+      {{ (
+          (
+            (cert_details | from_yaml).date_to | to_datetime('%Y-%m-%d') - ansible_date_time.date | to_datetime('%Y-%m-%d')
+          ).total_seconds()
+        ) | int / 60 / 60 / 24 | round(0) | int }}
+    now: "{{ ansible_date_time.date }}"
+    certificate_details_first_pass: "{{ signed_cert_details.stdout }}"
+  when: ssh_host_signed_cert.stat.exists
+
+
+- name: Create Host Keys
+  ansible.builtin.shell:
+    cmd: |
+      ssh-keygen -f ssh_host_ed25519_key -b 4096 -t ed25519 -C "" -q -N "" <<< ""$"y"'\n'
+    chdir: /etc/ssh
+    executable: /bin/bash
+  become: true
+  register: host_key_creation
+  changed_when: true
+  when: >
+    not ssh_host_key.stat.exists
+      or
+    not ssh_host_signed_cert.stat.exists
+      or
+    duration_remaining | default(0) | int < (nfc_ssh_renew_not_before | int * 30)
+
+
+- name: Confirm Key Exist
+  ansible.builtin.stat:
+    path: /etc/ssh/ssh_host_ed25519_key
+  failed_when: not ssh_host_key.stat.exists
+  register: ssh_host_key
+
+
+- name: Confirm Cert Exist
+  ansible.builtin.stat:
+    path: /etc/ssh/ssh_host_ed25519_key.pub
+  failed_when: not ssh_host_pub.stat.exists
+  register: ssh_host_pub
+
+
+- name: Copy Host public certificate locally for signing
+  ansible.builtin.fetch:
+    src: /etc/ssh/ssh_host_ed25519_key.pub
+    dest: /tmp/ssh_host_ed25519_key.pub
+    flat: yes
+  become: true
+  when: host_key_creation.changed | default(false) | bool
+
+
+## Sign cert with host ca
+- name: Sign Host Certificate with Host Certificate Authority Key
+  ansible.builtin.shell:
+    cmd: |
+      ssh-keygen \
+        -s /workdir/files/nww-nl/openssh-server_host_ca \
+        -I nww-nl.networkedweb.com \
+        -h \
+        -n nww-nl.networkedweb.com,185.224.139.188,192.168.122.97,k3s-prod \
+        -V +52w \
+        -C "" \
+        /tmp/ssh_host_ed25519_key.pub
+    chdir: /tmp
+    executable: /bin/bash
+  become: true
+  changed_when: true
+  delegate_to: localhost
+  vars:
+    ansible_connection: local
+  when: host_key_creation.changed | default(false) | bool
+
+
+- name: Copy Signed Host Certificate back to host
+  ansible.builtin.copy:
+    src: /tmp/ssh_host_ed25519_key-cert.pub
+    dest: /etc/ssh/ssh_host_ed25519_key-cert.pub
+    mode: '700'
+    owner: root
+    group: root
+  become: true
+  when: host_key_creation.changed | default(false) | bool
+
+
+- name: Confirm Signed Certificates Exist
+  ansible.builtin.stat:
+    path: /etc/ssh/ssh_host_ed25519_key-cert.pub
+  failed_when: not ssh_host_signed_cert.stat.exists
+  register: ssh_host_signed_cert
+
+
+- name: Collect SSH Certificate Details
+  ansible.builtin.command:
+    cmd: ssh-keygen -L -f /etc/ssh/ssh_host_ed25519_key-cert.pub
+  become: true
+  changed_when: false
+  register: signed_cert_details
+
+
+- name: Parse Certificate for validity dates
+  ansible.builtin.set_fact:
+    cert_details: |-
+      {%- for line in signed_cert_details.stdout_lines -%}
+        {%- if 'valid: from' in (line | trim | lower) -%}
+        {
+        "date_from": "{{ ((((((line | trim | lower) | split('to'))[0]) | split('from'))[1]) | split('t'))[0] | trim }}",
+        "date_to": "{{ (((line | trim | lower) | split('to'))[1] | split('t'))[0] | trim }}"
+        }
+        {%- endif -%}
+      {%- endfor %}
+
+
+- name: Save stats with certificate validity dates
+  ansible.builtin.set_stats:
+    data:
+      date_from: "{{ (cert_details | from_yaml).date_from }}"
+      date_to: "{{ (cert_details | from_yaml).date_to }}"
+      duration_remaining: >-
+        {{ (
+            (
+              (cert_details | from_yaml).date_to | to_datetime('%Y-%m-%d') - ansible_date_time.date | to_datetime('%Y-%m-%d')
+            ).total_seconds()
+          ) | int / 60 / 60 / 24 | round(0) | int }}
+      certificate_details_first_pass: "{{ certificate_details_first_pass }}"
+      certificate_details_second_pass: "{{ cert_details }}"
+      new_certificate_created: "{% if host_key_creation.skipped | default(true) %}false{% else %}true{% endif %}"
+    per_host: true

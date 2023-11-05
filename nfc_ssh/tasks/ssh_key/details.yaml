@@ -1,0 +1,117 @@
+---
+
+- name: Confirm Key Exist
+  ansible.builtin.stat:
+    path: /etc/ssh/ssh_host_{{ nfc_ssh_key_algorithm }}_key
+  register: ssh_host_key
+
+
+- name: Confirm public Certificate Exist
+  ansible.builtin.stat:
+    path: /etc/ssh/ssh_host_{{ nfc_ssh_key_algorithm }}_key.pub
+  register: ssh_host_public_cert
+
+
+- name: Confirm Signed Certificate Exist
+  ansible.builtin.stat:
+    path: /etc/ssh/ssh_host_{{ nfc_ssh_key_algorithm }}_key-cert.pub
+  register: ssh_host_signed_cert
+  when: nfc_ssh_sign_key_with_ca | bool
+
+
+- name: Collect SSH Certificate Details
+  ansible.builtin.command:
+    cmd: ssh-keygen -L -f /etc/ssh/ssh_host_{{ nfc_ssh_key_algorithm }}_key-cert.pub
+  become: true
+  changed_when: false
+  register: signed_cert_details
+  when: >
+    ssh_host_signed_cert.stat.exists
+      and
+    nfc_ssh_sign_key_with_ca | bool
+
+
+- name: Parse Certificate for validity dates
+  ansible.builtin.set_fact:
+    cert_details: |-
+      {%- for line in signed_cert_details.stdout_lines -%}
+        {%- if 'valid: from' in (line | trim | lower) -%}
+        {
+        "date_from": "{{ ((((((line | trim | lower) | split('to'))[0]) | split('from'))[1]) | split('t'))[0] | trim }}",
+        "date_to": "{{ (((line | trim | lower) | split('to'))[1] | split('t'))[0] | trim }}"
+        }
+        {%- endif -%}
+      {%- endfor %}
+  when: >
+    ssh_host_signed_cert.stat.exists
+      and
+    nfc_ssh_sign_key_with_ca | bool
+
+
+- name: Create fact with answer on requiring certificate creation
+  ansible.builtin.set_fact:
+    create_ssh_key: |-
+      {%- if
+        (
+          (
+            (
+              nfc_ssh_sign_key_with_ca | bool
+                and
+              not ssh_host_signed_cert.stat.exists | default(false) | bool
+            )
+              or
+            not nfc_ssh_sign_key_with_ca | bool
+          )
+            or
+          not ssh_host_key.stat.exists | default(false) | bool
+            or
+          not ssh_host_public_cert.stat.exists | default(false) | bool
+        )
+      -%}
+        true
+      {%- else -%}
+        false
+      {%- endif %}
+  when: >
+    create_ssh_key is not defined
+      and
+    not nfc_ssh_installed | default(false) | bool
+
+
+- name: Create facts with certificate details - Second pass
+  ansible.builtin.set_fact:
+    certificate_details_second_pass: "{{ signed_cert_details.stdout }}"
+  when: >
+    not certificate_details_first_pass | default('') == ''
+      and
+    ssh_host_signed_cert.stat.exists
+      and
+    nfc_ssh_sign_key_with_ca | bool
+
+
+- name: Create facts with certificate details - First pass
+  ansible.builtin.set_fact:
+    certificate_details_first_pass: "{{ signed_cert_details.stdout }}"
+  when: >
+    certificate_details_first_pass | default('') == ''
+      and
+    ssh_host_signed_cert.stat.exists
+      and
+    nfc_ssh_sign_key_with_ca | bool
+
+
+- name: Create facts with certificate validity dates
+  ansible.builtin.set_fact:
+    date_from: "{{ (cert_details | from_yaml).date_from }}"
+    date_to: "{{ (cert_details | from_yaml).date_to }}"
+    duration_remaining: >-
+      {{ (
+          (
+            (cert_details | from_yaml).date_to | to_datetime('%Y-%m-%d') - ansible_date_time.date | to_datetime('%Y-%m-%d')
+          ).total_seconds()
+        ) | int / 60 / 60 / 24 | round(0) | int }}
+    now: "{{ ansible_date_time.date }}"
+  when: >
+    ssh_host_signed_cert.stat.exists
+      and
+    nfc_ssh_sign_key_with_ca | bool
