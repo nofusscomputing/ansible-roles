@@ -24,9 +24,9 @@ Ansible.Execution_Environment.Submodule.Deploy:
     GIT_COMMIT_TYPE_CATEGORY: $CI_PROJECT_NAME
 
 
-Config.Submodule.Deploy:
-  extends: .submodule_update_trigger
-  variables:
-    SUBMODULE_UPDATE_TRIGGER_PROJECT: nofusscomputing/infrastructure/config
-    GIT_COMMIT_TYPE: feat
-    GIT_COMMIT_TYPE_CATEGORY: $CI_PROJECT_NAME
+# Config.Submodule.Deploy:
+#   extends: .submodule_update_trigger
+#   variables:
+#     SUBMODULE_UPDATE_TRIGGER_PROJECT: nofusscomputing/infrastructure/config
+#     GIT_COMMIT_TYPE: feat
+#     GIT_COMMIT_TYPE_CATEGORY: $CI_PROJECT_NAME
