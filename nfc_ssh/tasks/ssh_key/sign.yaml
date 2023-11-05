@@ -1,0 +1,53 @@
+---
+
+- name: Check if signing key exists
+  ansible.builtin.stat:
+    path: "{{ nfc_ssh_path_host_ca_key }}"
+  become: true
+  delegate_to: localhost
+  failed_when: not nfc_ssh_host_ca_key_check.stat.exists
+  register: nfc_ssh_host_ca_key_check
+  vars:
+    ansible_connection: local
+
+
+- name: Copy Host public certificate locally for signing
+  ansible.builtin.fetch:
+    src: /etc/ssh/ssh_host_{{ nfc_ssh_key_algorithm }}_key.pub
+    dest: /tmp/ssh_host_{{ nfc_ssh_key_algorithm }}_key.pub
+    flat: true
+  become: true
+  when: host_key_creation.changed | default(false) | bool
+
+
+## Sign cert with host ca
+- name: Sign Host Certificate with Host Certificate Authority Key
+  ansible.builtin.shell:
+    cmd: |
+      ssh-keygen \
+        -s {{ nfc_ssh_path_host_ca_key }} \
+        -I {{ ansible_host }} \
+        -h \
+        -n {{ ansible_host }} \
+        -V +52w \
+        -C "" \
+        /tmp/ssh_host_{{ nfc_ssh_key_algorithm }}_key.pub
+    chdir: /tmp
+    executable: /bin/bash
+  become: true
+  changed_when: true
+  delegate_to: localhost
+  vars:
+    ansible_connection: local
+  when: host_key_creation.changed | default(false) | bool
+
+
+- name: Copy Signed Host Certificate back to host
+  ansible.builtin.copy:
+    src: /tmp/ssh_host_{{ nfc_ssh_key_algorithm }}_key-cert.pub
+    dest: /etc/ssh/ssh_host_{{ nfc_ssh_key_algorithm }}_key-cert.pub
+    mode: '700'
+    owner: root
+    group: root
+  become: true
+  when: host_key_creation.changed | default(false) | bool

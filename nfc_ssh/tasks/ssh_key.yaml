@@ -1,0 +1,25 @@
+---
+
+- name: Fetch Certificate/Key Details
+  ansible.builtin.include_tasks:
+    file: ssh_key/details.yaml
+
+
+- name: Create Host Keys
+  ansible.builtin.include_tasks:
+    file: ssh_key/create.yaml
+
+
+- name: Sign Host Public Key
+  ansible.builtin.include_tasks:
+    file: ssh_key/sign.yaml
+
+
+- name: Fetch Certificate/Key Details
+  ansible.builtin.include_tasks:
+    file: ssh_key/details.yaml
+
+
+- name: Add Details to play stats
+  ansible.builtin.include_tasks:
+    file: ssh_key/stats.yaml

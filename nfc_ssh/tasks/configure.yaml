@@ -1,0 +1,48 @@
+---
+
+
+- name: Create/Check Host Keys
+  ansible.builtin.include_tasks:
+    file: ssh_key.yaml
+
+
+- name: "Default config - 'opensshd_config'"
+  ansible.builtin.template:
+    src: sshd_config.j2
+    dest: "/etc/ssh/sshd_config"
+    owner: root
+    mode: '600'
+    force: true
+  register: opensshd_config
+  notify: restart_openssh_server
+
+
+- name: Remove File [ssh_host_dsa_key]
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  notify: restart_openssh_server
+  loop: "{{ files_to_clean }}"
+  vars:
+    files_to_clean:
+      - /etc/ssh/ssh_host_dsa_key
+      - /etc/ssh/ssh_host_dsa_key.pub
+      - /etc/ssh/ssh_host_rsa_key
+      - /etc/ssh/ssh_host_rsa_key.pub
+      - /etc/ssh/ssh_host_ecdsa_key
+      - /etc/ssh/ssh_host_ecdsa_key.pub
+
+
+- name: Copy User Certificate Authority Certificate
+  ansible.builtin.copy:
+    content: "{{ nfc_ssh_user_ca_public_key }}"
+    dest: "/etc/ssh/user_ca.pub"
+    owner: root
+    mode: '600'
+    force: true
+  notify: restart_openssh_server
+
+
+- name: Create configured fact
+  ansible.builtin.set_fact:
+    nfc_ssh_configured_sshd: true

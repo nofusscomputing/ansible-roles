@@ -1,0 +1,21 @@
+---
+
+- name: Save stats with certificate validity dates
+  ansible.builtin.set_stats:
+    data:
+      nfc_ssh:
+        sshd:
+          host_key_details:
+            configured_algorithm: "{{ nfc_ssh_key_algorithm }}"
+            date_from: "{{ (cert_details | from_yaml).date_from }}"
+            date_to: "{{ (cert_details | from_yaml).date_to }}"
+            validity_duration_remaining: >-
+              {{ (
+                  (
+                    (cert_details | from_yaml).date_to | to_datetime('%Y-%m-%d') - ansible_date_time.date | to_datetime('%Y-%m-%d')
+                  ).total_seconds()
+                ) | int / 60 / 60 / 24 | round(0) | int }}
+            certificate_details_first_pass: "{{ certificate_details_first_pass }}"
+            certificate_details_second_pass: "{{ certificate_details_second_pass | default('') }}"
+            new_certificate_created: "{{ host_key_creation.changed | default(false) | bool }}"
+    per_host: true

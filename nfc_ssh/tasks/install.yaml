@@ -1,0 +1,90 @@
+---
+
+- name: OpenSSH Server install check
+  ansible.builtin.shell: |
+    dpkg -s openssh-server
+  register: openssh_server_check_installed
+  changed_when: false
+  failed_when: openssh_server_check_installed.rc | int > 1
+  no_log: true # only require rc
+
+
+# # - name: Installed Version Check
+# #   ansible.builtin.command:
+# #     cmd: fail2ban-client version
+# #   register: fail2ban_version_command
+# #   changed_when: "'never' == 'changes'"
+# #   failed_when: fail2ban_version_command.rc != 0
+# #   when: fail2ban_installed.rc | int == 0
+
+
+- name: OpenSSH Server playbook variables
+  ansible.builtin.set_fact:
+    openssh_server_installed: "{% if openssh_server_check_installed.rc | int == 0 %}{{ 'true' }}{% else %}{{ 'false' }}{% endif %}"
+    openssh_server_port: "{{ openssh_server_port }}"
+    # fail2ban_correct_version_installed: >-
+    #   {%- if fail2ban.version == fail2ban_version_command.stdout | default('0') -%}
+    #     {{ 'true' }}
+    #   {%- else -%}
+    #     {{ 'false' }}
+    #   {%- endif -%}
+    cacheable: true
+
+
+- name: Install Openssh-server
+  ansible.builtin.include_role:
+    name: nfc_common
+  when: >
+    install_openssh_server | bool
+  vars:
+    aptInstall:
+      - name: openssh-server
+        version: "{{ openssh_server_version | default('') }}"
+
+
+- name: OpenSSH Server install check
+  ansible.builtin.shell: |
+    dpkg -s openssh-server
+  register: openssh_server_check_installed
+  changed_when: false
+  failed_when: openssh_server_check_installed.rc | int > 1
+  no_log: true # only require rc
+
+
+- name: OpenSSH Server playbook variables
+  ansible.builtin.set_fact:
+    nfc_ssh_installed_sshd: "{% if openssh_server_check_installed.rc | int == 0 %}{{ 'true' }}{% else %}{{ 'false' }}{% endif %}"
+    cacheable: true
+
+
+- name: OpenSSH-Server service enable and start
+  ansible.builtin.service:
+    name: sshd
+    state: started
+    enabled: true
+  when: >
+    install_openssh_server | bool
+      and
+    not openssh_server_installed | bool
+
+
+# - name: "Fail2Ban Jail for SSHd"
+#   ansible.builtin.include_role:
+#     name: nfc_firewall
+#   #  apply:
+#   vars:
+#     fail2ban:
+#       config:
+#         - name: sshd
+#           sub_path: jail.d
+#           sections:
+#             sshd:
+#               enabled: 'true'
+#               backend: "{{ fail2ban_backend | default('polling') }}"
+#               chain: INPUT
+#               port: ssh
+#               # logpath = %(sshd_log_localhost)s
+#               filter: sshd[mode=aggressive]
+#               maxretry: 3
+  # when: >
+  #   fail2ban_installed | default(false) | bool

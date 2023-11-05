@@ -1,0 +1,132 @@
+---
+
+- name: Install SSH Server
+  ansible.builtin.include_tasks:
+    file: install.yaml
+    apply:
+      tags:
+        - always
+  tags:
+    - install
+  when: >
+    nfc_ssh_install_sshd | bool
+      and
+    not nfc_ssh_installed_sshd | bool
+
+
+- name: Fail2ban
+  tags:
+    - install
+  block:
+
+    - name: Fail2ban ssh Configuration
+      ansible.builtin.include_role:
+        name: nfc_firewall
+        apply:
+          tags:
+            - always
+      when: >
+        nfc_ssh_install_sshd | bool
+          and
+        install_fail2ban | default(false) | bool
+      vars:
+        # fail2ban:
+        #   jail:
+        #     - name: sshd
+        #       jail:
+        #         - "{{ openssh_server_fail2ban_jail | from_yaml }}"
+        fail2ban:
+          config:
+            - name: sshd
+              sub_path: jail.d
+              sections:
+                sshd:
+                  enabled: 'true'
+                  backend: "{{ fail2ban_backend | default('polling') }}"
+                  chain: INPUT
+                  port: ssh
+                  # logpath = %(sshd_log_localhost)s
+                  filter: sshd[mode=aggressive]
+                  maxretry: 3
+  rescue:
+
+    - name: Display message as nfc_firewall role may not exists
+      ansible.builtin.debug:
+        msg: |
+          'nfc_firwall' role may no exist. you can ignore this error,
+          unless you wish to configure the ssh fail2ban jail.
+
+
+- name: Configure SSH Server
+  ansible.builtin.include_tasks:
+    file: configure.yaml
+    apply:
+      tags:
+        - always
+  tags:
+    - install
+    - configure
+  when: >
+    (
+      nfc_ssh_installed_sshd | bool
+        and
+      not nfc_ssh_configured_sshd | bool
+    )
+      or
+    (
+      not nfc_ssh_configured_sshd | bool
+        and
+      'configure' in ansible_run_tags
+    )
+
+
+- name: Check host SSH Certificate
+  ansible.builtin.include_tasks:
+    file: "{{ item }}"
+    apply:
+      tags:
+        - always
+  loop: "{{ check_tasks }}"
+  when: >
+    nfc_ssh is not defined
+  vars:
+    check_tasks:
+      - ssh_key/details.yaml
+      - ssh_key/stats.yaml
+  tags:
+    - never
+    - check
+  # when: nfc_ssh_installed | bool
+
+
+- name: Recreate/Renew host SSH Keys and Certificate
+  ansible.builtin.include_tasks:
+    file: ssh_key.yaml
+    apply:
+      tags:
+        - always
+  tags:
+    - never
+    - renew
+
+- name: Create nfc_ssh Final Stats
+  ansible.builtin.set_stats:
+    data:
+      nfc_ssh:
+        sshd:
+          enabled: "{{ nfc_ssh_install_sshd }}"
+          installed: "{{ nfc_ssh_installed_sshd }}"
+          configured: "{{ nfc_ssh_configured_sshd }}"
+          configuration: "{{ openssh_server_config | from_yaml }}"
+    per_host: true
+  when: nfc_ssh_run_again | default(true) | bool
+  tags:
+    - always
+
+- name: Run Once Flag - nfc_ssh
+  ansible.builtin.set_fact:
+    nfc_ssh_run_again: false
+  when: >
+    nfc_ssh_run_again | default(true) | bool
+  tags:
+    - always
