@@ -4,4 +4,4 @@
     name: sshd
     state: restarted
   listen: 'restart_openssh_server'
-  when: openssh_server_installed | bool
+  when: nfc_ssh_installed_sshd | bool
