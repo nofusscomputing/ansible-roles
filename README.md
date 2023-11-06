@@ -16,6 +16,16 @@ links:
 - [Merge Requests (Pull Requests)](https://gitlab.com/nofusscomputing/projects/ansible-roles/-/merge_requests)
 
 
+> **NOTE:** *this repository is undr going a restructure. the existing roles are intended to move to their own repo, if they're still useful. This repository will be restructured to have each of No Fuss Computings Roles included in the root of this repo as submodules. this is being done, so there is one location with all of our roles that can easily be included in other projects.*
+>
+>
+
+<br><br>
+
+<details>
+
+<summary>README - Pre-Restructure</summary>
+
 This repository contains ansible roles. Within each role directory, you will find a readme that explains the role in question.
 
 Each of the roles are designed in a way that they can be used as dependencies for your own roles. They are also designed to run them over and over so that you can determine if anything has changed.
@@ -50,6 +60,10 @@ If your ansible roles are not part of a git repository _(why?)_ you can just clo
 For those who have thier ansible roles directory as part of a git repo, it is suggested to add this repository as a sub module. Using this option enables your git history to track what commit of our repository you are using. We encourage keeping the sub-module updated to a git tag for stability.
 
 To utilise our role create your own role, and include our role as a dependency. As our roles will require you to configure them to suit your environment. For example, create a role `{rolename}_configuration` then include `{rolename}` as a dependency of the created role.
+
+</details>
+
+<br><br>
 
 ## Changelog
 The master changelog is available in the [repo](https://gitlab.com/nofusscomputing/projects/ansible-roles/CHANGELOG.md). Every time we create a release including for alpha releases, the changelog is updated.

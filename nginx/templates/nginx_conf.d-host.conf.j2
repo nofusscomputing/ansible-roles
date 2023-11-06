@@ -1,0 +1,23 @@
+#server_tokens off;
+
+#proxy_hide_header Server;
+
+#proxy_hide_header X-Powered-By;
+
+server {
+
+    listen {% if item.port is defined %}{{ item.port }} {% else %}80{% endif %};
+
+    {% if item.server_names is defined %}server_name  {{ item.server_names }};
+{% endif %}
+    access_log /var/log/nginx/access-{{ item.name }}.log main;
+    error_log /var/log/nginx/error-{{ item.name }}.log;
+
+    error_page   500 502 503 504  /50x.html;
+
+        location {% if item.location.http_location is defined %}{{ item.location.http_location }}{% else %}/{% endif %}  {
+          {% if item.location.file_location is defined %}root    {{ item.location.file_location }}{% else %}return 404{% endif %};
+
+        }
+
+}

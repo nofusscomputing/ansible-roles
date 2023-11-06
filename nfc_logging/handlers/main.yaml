@@ -1,0 +1,20 @@
+---
+- name: Log Rotate Configuration files
+  ansible.builtin.template:
+    src: definition.j2
+    dest: "{{ directory_logrotate_config }}/{{ item.name }}"
+    owner: root
+    mode: '0644'
+    force: true
+  loop: "{{ logrotate_configuration }}"
+  listen: 'configure_logrotate'
+  notify: restart_logrotate
+  when: logrotate_installed | bool
+
+
+- name: Restart logrotate
+  ansible.builtin.service:
+    name: logrotate
+    state: restarted
+  listen: restart_logrotate
+  when: logrotate_installed | bool

@@ -1,0 +1,17 @@
+---
+
+- name: Create Host Keys
+  ansible.builtin.shell:
+    cmd: |
+      ssh-keygen -f ssh_host_{{ nfc_ssh_key_algorithm }}_key -b 4096 -t {{ nfc_ssh_key_algorithm }} -C "" -q -N "" <<< ""$"y"'\n'
+    chdir: /etc/ssh
+    executable: /bin/bash
+  become: true
+  register: host_key_creation
+  changed_when: true
+  when: >
+    create_ssh_key | default(false) | bool
+      or
+    duration_remaining | default(0) | int < (nfc_ssh_renew_not_before | int * 30)
+      or
+    'renew' in ansible_run_tags

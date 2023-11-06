@@ -1,42 +1,32 @@
+---
 
-stages:
-    - validation
-    - release
-    - sync
+include:
+  - project: nofusscomputing/projects/gitlab-ci
+    ref: development
+    file:
+      - .gitlab-ci_common.yaml
+      - template/automagic.gitlab-ci.yaml
+
 
 variables:
-    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_SYNC_URL: "https://$GITHUB_USERNAME_ROBOT:$GITHUB_TOKEN_ROBOT@github.com/NoFussComputing/ansible-roles.git"
+    
     MY_PROJECT_ID: "28204898"
     NFC_GITLAB_SUBMODULE_HASH: '$(git submodule status --recursive | awk "{print $$1}")'
     NFC_GITLAB_CI_URL: "https://gitlab.com/nofusscomputing/projects/gitlab-ci/-/raw/$NFC_GITLAB_SUBMODULE_HASH"
 
 
-include:
-  - project: nofusscomputing/projects/gitlab-ci
-    ref: 9cd94c124c8076f72cde698a52cad15dbbe4a576
-    file:
-      - conventional_commits/.gitlab-ci.yml
-      - gitlab_release/.gitlab-ci.yml
-      - git_push_mirror/.gitlab-ci.yml
-      - ansible/.gitlab-ci.yml
+Ansible.Execution_Environment.Submodule.Deploy:
+  extends: .submodule_update_trigger
+  variables:
+    SUBMODULE_UPDATE_TRIGGER_PROJECT: nofusscomputing/projects/ansible/execution_environment
+    GIT_COMMIT_TYPE: feat
+    GIT_COMMIT_TYPE_CATEGORY: $CI_PROJECT_NAME
 
 
-Ansible Lint (python 3.6):
-    variables:
-        ANSIBLE_LINT_PATH: "roles/"
-    extends:
-        - .ansible_linter_defaults
-    image: python:3.6-slim
-
-
-Gitlab Release:
-    extends:
-        - .gitlab_release
-
-
-Github (Push --mirror):
-    variables:
-        GIT_SYNC_URL: "https://$GITHUB_USERNAME_ROBOT:$GITHUB_TOKEN_ROBOT@github.com/NoFussComputing/ansible-roles.git"
-    extends:
-        - .git_push_mirror
-
+# Config.Submodule.Deploy:
+#   extends: .submodule_update_trigger
+#   variables:
+#     SUBMODULE_UPDATE_TRIGGER_PROJECT: nofusscomputing/infrastructure/config
+#     GIT_COMMIT_TYPE: feat
+#     GIT_COMMIT_TYPE_CATEGORY: $CI_PROJECT_NAME

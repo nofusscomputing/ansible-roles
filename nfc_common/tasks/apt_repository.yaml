@@ -1,0 +1,66 @@
+---
+- name: Fetch repository signing key
+  ansible.builtin.get_url:
+    url: "{{ item.url }}"
+    dest: "{{ item.save_directory }}/{{ item.name }}.{{ item.file_extension }}"
+  with_items: "{{ [ aptSigningKeys ] | community.general.lists_mergeby( hostConfig.aptSigningKeys | default(''), 'name', list_merge = 'replace' ) }}"
+  when:
+    - ansible_os_family == 'Debian'
+
+
+- name: Add apt repository
+  apt_repository:
+    repo: "{{ item.repo }}"
+    state: present
+    filename: "{{ item.name }}"
+  with_items: "{{ [ aptRepositories ] | community.general.lists_mergeby(hostConfig.aptRepositories|default(''), 'name', list_merge='replace') }}"
+  when:
+    - ansible_os_family == 'Debian'
+
+
+- name: Apt Update
+  block:
+
+
+    - name: Apt cache update
+      ansible.builtin.apt:
+        update_cache: true
+      register: apt_cache_update
+      changed_when: false
+
+
+  rescue:
+
+    - name: APT Clean
+      ansible.builtin.command:
+        cmd: apt-get Clean
+      changed_when: false
+      failed_when: false
+      when: apt_cache_update.rc | int == 100
+
+    - name: APT remove cache
+      ansible.builtin.command:
+        cmd: rm -rf /var/lib/apt/lists/*
+      changed_when: false
+      failed_when: false
+      when: apt_cache_update.rc | int == 100
+
+    - name: Apt cache update
+      ansible.builtin.apt:
+        update_cache: true
+      changed_when: false
+      when: apt_cache_update.rc | int == 100
+
+    - name: Force error on unrecognized
+      ansible.builtin.assert:
+        that:
+          - apt_cache-update.rc | int != 100
+        msg: APT Update unknown error
+      when: apt_cache-update.rc | int != 100
+
+
+
+- name: Clear task variables
+  ansible.builtin.set_fact:
+    aptRepositories: []
+    aptSigningKeys: []

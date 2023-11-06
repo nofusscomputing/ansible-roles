@@ -1,0 +1,62 @@
+---
+
+nfc_ssh_configured_sshd: false
+
+nfc_ssh_install_sshd: false
+
+nfc_ssh_installed_sshd: false
+
+nfc_ssh_key_algorithm: ed25519
+
+nfc_ssh_path_host_ca_key: /workdir/files/nww-nl/openssh-server_host_ca
+
+nfc_ssh_host_ca_decryption_key: '' # by default, must be defined as empty string
+nfc_ssh_host_ca_public_key: ''     # by default, must be defined as empty string
+nfc_ssh_user_ca_public_key: ''     # by default, must be defined as empty string
+
+nfc_ssh_renew_not_before: 2      # Int. how many months before expirey can the ssh host certificate be renewed
+
+nfc_ssh_sign_key_with_ca: true   # bool. Sign the host public certificat with the host certificate authority certificate
+
+
+openssh_server_port: 22
+
+# openssh_server_version: # Optional, string, matches the apt version, used for installation default=not defined
+openssh_server_fail2ban_jail:
+  name: sshd
+  enabled: 'true'
+  chain: INPUT
+  port: ssh
+  filter: sshd[mode=aggressive]
+  maxretry: 3
+  findtime: 86400
+  bantime: 86400
+
+
+openssh_server_config:
+  ChallengeResponseAuthentication: 'no'
+  UsePAM: 'yes'
+  AcceptEnv LANG: LC_*
+  Subsystem: sftp	/usr/lib/openssh/sftp-server
+  PasswordAuthentication: 'yes'
+  Protocol: 2 # Use SSH v2
+  Port: "{{ openssh_server_port }}"
+  PrintMotd: 'yes'
+  LoginGraceTime: 60 # Disconnect after 1 mins if not logged in
+  PermitRootLogin: 'no' # Disable root login
+  # AllowUsers username-here # And add a list of authorized users (separated by a space)
+  MaxStartups: 2 # maximum concurrent connections
+  AllowTcpForwarding: 'no' # Disable ssh port forwarding
+  X11Forwarding: 'no'
+  LogLevel: VERBOSE
+  PermitEmptyPasswords: 'no'
+  ClientAliveInterval: 120 # Idle timeout
+  ClientAliveCountMax: 0
+  MaxAuthTries: 7 # try to auth no more than 7 times. (must be one higher than fail2ban so that fail2ban can block)
+
+      # for public key authentication the following is required
+  PubkeyAuthentication: 'yes'
+  HostCertificate: /etc/ssh/ssh_host_ed25519_key-cert.pub
+  TrustedUserCAKeys: /etc/ssh/user_ca.pub
+      # the following are suggested, as cert authentication is preferred
+  # PasswordAuthentication: 'no'
