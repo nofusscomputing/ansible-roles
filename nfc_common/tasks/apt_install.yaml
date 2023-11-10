@@ -23,7 +23,7 @@
     name: "{{ apt_package.name }}"
     selection: "{% if apt_package.version is defined %}hold{% else %}install{% endif %}"
   when: >
-    apt_package.state | default('present') | != 'absent'
+    apt_package.state | default('present') != 'absent'
       and
     apt_package.version is defined
 
