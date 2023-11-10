@@ -1,5 +1,29 @@
 ---
 
+- name: Host Template Filez
+  ansible.builtin.include_tasks:
+    file: template.yaml
+  loop: "{{ hostConfig.files.templates | default([]) | list }}"
+  loop_control:
+    loop_var: file_template
+
+
+- name: APT Repositories
+  ansible.builtin.include_tasks:
+    file: apt_repository.yaml
+  loop: "{{ hostConfig.aptRepositories | default([]) | list }}"
+  loop_control:
+    loop_var: apt_repository
+  when: ansible_os_family == 'Debian'
+
+
+- name: Install Specified Host Packages
+  ansible.builtin.include_tasks:
+    file: apt_install.yaml
+  loop: "{{ hostConfig.aptPackages | default([]) | list }}"
+  loop_control:
+    loop_var: apt_package
+  when: ansible_os_family == 'Debian'
 
 
 - name: Setup ansible temp directory
@@ -11,8 +35,6 @@
     mode: '0700'
   delegate_to: localhost
   connection: local
-  tags:
-    - always
 
 
 - name: Find directory root
@@ -33,8 +55,6 @@
   connection: local
   become: false
   changed_when: true == false
-  tags:
-    - always
 
 
 - name: Set initial common facts
@@ -42,8 +62,6 @@
     configured_directory_temp_ansible: '/tmp/ansible'
     configured_directory_root: "{{ directory_root_search.stdout }}"
     cacheable: true
-  tags:
-    - always
 
 
 - name: Get ansible user name
@@ -53,17 +71,15 @@
   delegate_to: localhost
   connection: local
   changed_when: "'never' == 'changed'"
-  tags:
-    - always
 
 
-- name: Ansible host SSH Configuration
-  ansible.builtin.include_tasks:
-    file: ssh.yaml
-  when: >
-    not init | default(false)
-      and
-    ansible_connection == 'ssh'
+# - name: Ansible host SSH Configuration
+#   ansible.builtin.include_tasks:
+#     file: ssh.yaml
+#   when: >
+#     not init | default(false)
+#       and
+#     ansible_connection == 'ssh'
 
 
 
@@ -108,8 +124,6 @@
     ansible_host != 'localhost'
       and
     ansible_host != 'nww-nl.networkedweb.com'
-  tags:
-    - always
 
 
 #
@@ -123,14 +137,10 @@
   changed_when: true == false
   args:
     executable: /bin/bash
-  #when: ansible_os_family == 'Debian'
-  tags:
-    - always
+
 
 - name: Set initial common facts
   ansible.builtin.set_fact:
     initial_common_tasks: true
     dynamic_processor_architecture: "{{ dynamic_processor_architecture_cli.stdout | default('unknown') }}"
     cacheable: true
-  tags:
-    - always
