@@ -1,8 +1,28 @@
 ---
 
+- name: Create Apt proxy configuration file
+  ansible.builtin.template:
+    src: 'apt_proxy.conf'
+    dest: '/etc/apt/apt.conf.d/apt_proxy.conf'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  when: >
+    apt_proxy_url is defined
+      and
+    apt_proxy_url | default('') != ''
+      and
+    ansible_os_family == 'Debian'
+      and
+    not initial_common_tasks | default(false) | bool
+
+
 - name: Initial playbook setup
   ansible.builtin.include_tasks:
     file: initial.yaml
+    apply:
+      tags:
+        - always
   when: not initial_common_tasks | default(false) | bool
   tags:
     - always
@@ -20,47 +40,37 @@
 #  Common functions
 #
 
-- name: Create Apt proxy configuration file
-  ansible.builtin.template:
-    src: 'apt_proxy.conf'
-    dest: '/etc/apt/apt.conf.d/apt_proxy.conf'
-    owner: 'root'
-    group: 'root'
-    mode: '0644'
-  when: >
-    apt_proxy_url is defined
-      and
-    apt_proxy_url | default('')| length | int > 0
-
-
-- name: Create Apt proxy configuration file
-  ansible.builtin.file:
-    name: '/etc/apt/apt.conf.d/apt_proxy.conf'
-    state: absent
-  when: >
-    apt_proxy_url is defined
-      and
-    apt_proxy_url | default('')| length | int == 0
-
 
 - name: APT Repositories
-  ansible.builtin.include_tasks: apt_repository.yaml
-  when: >
-    aptRepositories is defined
-      and
-    aptRepositories | default('') | length | int > 0
+  ansible.builtin.include_tasks:
+    file: apt_repository.yaml
+    apply:
+      tags:
+        - always
+  loop: "{{ aptRepositories | default([]) | list }}"
+  loop_control:
+    loop_var: apt_repository
+  when: ansible_os_family == 'Debian'
 
 
 - name: APT Installation
-  ansible.builtin.include_tasks: apt_install.yaml
-  when: >
-    aptInstall is defined
-      and
-    aptInstall | default('') | length > 0
+  ansible.builtin.include_tasks:
+    file: apt_install.yaml
+    apply:
+      tags:
+        - always
+  loop: "{{ aptInstall | default([]) | list }}"
+  loop_control:
+    loop_var: apt_package
+  when: ansible_os_family == 'Debian'
 
 
 - name: Template Filez
-  ansible.builtin.include_tasks: template.yaml
-  when: files.templates is defined
-#      and
-#    files.templates | default ('') | length | int > 0
+  ansible.builtin.include_tasks:
+    file: template.yaml
+    apply:
+      tags:
+        - always
+  loop: "{{ files.templates | default([]) | list }}"
+  loop_control:
+    loop_var: file_template
