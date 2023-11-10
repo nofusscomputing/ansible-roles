@@ -1,0 +1,28 @@
+  - name: Add Executable - 'dyndns'
+    template:
+      src: duckdns.j2
+      dest: "/bin/dyndns"
+      owner: root
+      mode: 0700
+      force: yes
+    when: DUCKDNS_HOST is defined and DUCKDNS_TOKEN is defined
+    tags:
+      - configure
+      - install
+      - prepare
+
+  - name: Create crontab entry - 'dyndns'
+    cron:
+      name: dyndns
+      weekday: "*"
+      minute: "*/30"
+      hour: "*"
+      user: root
+      job: "/bin/dyndns"
+      state: present
+      cron_file: dyndns-duckdns
+    when: DUCKDNS_HOST is defined and DUCKDNS_TOKEN is defined
+    tags:
+      - configure
+      - install
+      - prepare
