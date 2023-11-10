@@ -53,17 +53,15 @@
   delegate_to: localhost
   connection: local
   changed_when: "'never' == 'changed'"
-  tags:
-    - always
 
 
-- name: Ansible host SSH Configuration
-  ansible.builtin.include_tasks:
-    file: ssh.yaml
-  when: >
-    not init | default(false)
-      and
-    ansible_connection == 'ssh'
+# - name: Ansible host SSH Configuration
+#   ansible.builtin.include_tasks:
+#     file: ssh.yaml
+#   when: >
+#     not init | default(false)
+#       and
+#     ansible_connection == 'ssh'
 
 
 
