@@ -18,3 +18,7 @@
 	path = nfc_kubernetes
 	url = https://gitlab.com/nofusscomputing/projects/ansible/kubernetes.git
 	branch = development
+[submodule "common"]
+	path = nfc_common
+	url = https://gitlab.com/nofusscomputing/projects/ansible/common.git
+	branch = development
