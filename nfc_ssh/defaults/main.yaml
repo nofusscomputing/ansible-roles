@@ -38,7 +38,6 @@ openssh_server_config:
   UsePAM: 'yes'
   AcceptEnv LANG: LC_*
   Subsystem: sftp	/usr/lib/openssh/sftp-server
-  PasswordAuthentication: 'yes'
   Protocol: 2 # Use SSH v2
   Port: "{{ openssh_server_port }}"
   PrintMotd: 'yes'
@@ -59,4 +58,4 @@ openssh_server_config:
   HostCertificate: /etc/ssh/ssh_host_ed25519_key-cert.pub
   TrustedUserCAKeys: /etc/ssh/user_ca.pub
       # the following are suggested, as cert authentication is preferred
-  # PasswordAuthentication: 'no'
+  PasswordAuthentication: 'no'
