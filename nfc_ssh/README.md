@@ -167,3 +167,55 @@ User Certificate Authority Public Key.
     }
 }
 ```
+
+
+## Key creation
+
+To create a User/Host CA Keys
+
+``` bash
+
+# Host Issuing key (password protect)
+ssh-keygen -t ed25519 -b 4096 -f host_ca -C host_ca
+
+#user issuing key (password protect)
+ssh-keygen -t ed25519 -b 4096 -f user_ca -C user_ca
+
+# add host_ca.pub contents to known hosts to accept keys from this host.
+echo @cert-authority *.{domain name} $(cat host_ca.pub) >> ~/.ssh/known_hosts
+
+
+```
+
+User Keys
+
+``` bash
+ssh-keygen -f ~/.ssh/id_ed25519 -b 4096 -t ed25519 -C "generated on $(date)"
+chmod 600 ~/.ssh/id_ed25519
+ls -l ~/.ssh
+
+# Sign
+ssh-keygen -s user_ca -I deploy -n deploy -n sysadmin -V +52w  -C "generated on $(date)" ~/.ssh/id_ed25519.pub
+
+# Check
+ssh-keygen -L -f ~/.ssh/id_ed25519-cert.pub
+
+cat <<'EOF' > ~/.ssh/config
+Host tabs
+     HostName {host_name_or_ip}
+     User     {username}
+     IdentityFile       ~/.ssh/id_ed25519
+
+Host scm.company.com
+     User       cap
+     IdentityFile       ~/.ssh/git_rsa
+
+Host project-staging
+     HostName 50.56.101.167
+     User     me
+     IdentityFile       ~/.ssh/new_rsa
+
+EOF
+
+
+```

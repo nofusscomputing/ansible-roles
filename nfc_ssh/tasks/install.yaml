@@ -35,7 +35,7 @@
   ansible.builtin.include_role:
     name: nfc_common
   when: >
-    install_openssh_server | bool
+    nfc_ssh_install_sshd | bool
   vars:
     aptInstall:
       - name: openssh-server
@@ -63,7 +63,7 @@
     state: started
     enabled: true
   when: >
-    install_openssh_server | bool
+    nfc_ssh_install_sshd | bool
       and
     not openssh_server_installed | bool
 

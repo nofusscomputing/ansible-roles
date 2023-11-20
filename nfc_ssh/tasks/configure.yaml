@@ -35,7 +35,7 @@
 
 - name: Copy User Certificate Authority Certificate
   ansible.builtin.copy:
-    content: "{{ nfc_ssh_user_ca_public_key }}"
+    src: "{{ nfc_ssh_user_ca_public_key }}"
     dest: "/etc/ssh/user_ca.pub"
     owner: root
     mode: '600'
