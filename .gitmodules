@@ -22,3 +22,7 @@
 	path = nfc_common
 	url = https://gitlab.com/nofusscomputing/projects/ansible/common.git
 	branch = development
+[submodule "nfc_test"]
+	path = nfc_test
+	url = https://gitlab.com/nofusscomputing/projects/ansible/ansible_test.git
+	branch = development
