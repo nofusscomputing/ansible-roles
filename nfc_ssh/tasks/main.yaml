@@ -21,7 +21,7 @@
 
     - name: Fail2ban ssh Configuration
       ansible.builtin.include_role:
-        name: nfc_firewall
+        name: nofusscomputing.firewall.nfc_firewall
         apply:
           tags:
             - always
