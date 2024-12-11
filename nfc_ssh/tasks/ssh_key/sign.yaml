@@ -26,6 +26,7 @@
     cmd: |
       ssh-keygen \
         -s {{ nfc_ssh_path_host_ca_key }} \
+        {% if nfc_ssh_host_ca_decryption_key | default('') != '' %}-P {{ nfc_ssh_host_ca_decryption_key }}{% endif %} \
         -I {{ ansible_host }} \
         -h \
         -n {{ ansible_host }} \
@@ -37,6 +38,8 @@
   become: true
   changed_when: true
   delegate_to: localhost
+  no_log: "{{ nfc_ssh_host_ca_decryption_key | default('') != '' }}"    # Contains a secret
+  timeout: 120
   vars:
     ansible_connection: local
   when: host_key_creation.changed | default(false) | bool

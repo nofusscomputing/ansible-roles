@@ -28,26 +28,20 @@
       when: >
         nfc_ssh_install_sshd | bool
           and
-        install_fail2ban | default(false) | bool
+        nfc_role_firewall_install_fail2ban | default(false) | bool
       vars:
-        # fail2ban:
-        #   jail:
-        #     - name: sshd
-        #       jail:
-        #         - "{{ openssh_server_fail2ban_jail | from_yaml }}"
-        fail2ban:
-          config:
-            - name: sshd
-              sub_path: jail.d
-              sections:
-                sshd:
-                  enabled: 'true'
-                  backend: "{{ fail2ban_backend | default('polling') }}"
-                  chain: INPUT
-                  port: ssh
-                  # logpath = %(sshd_log_localhost)s
-                  filter: sshd[mode=aggressive]
-                  maxretry: 3
+        fail2ban_configuration:
+          - name: sshd
+            sub_path: jail.d
+            sections:
+              sshd:
+                enabled: 'true'
+                backend: "{{ fail2ban_backend | default('polling') }}"
+                chain: INPUT
+                port: ssh
+                # logpath = %(sshd_log_localhost)s
+                filter: sshd[mode=aggressive]
+                maxretry: 3
   rescue:
 
     - name: Display message as nfc_firewall role may not exists
