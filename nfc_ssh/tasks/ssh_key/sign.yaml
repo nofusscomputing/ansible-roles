@@ -39,6 +39,7 @@
   changed_when: true
   delegate_to: localhost
   no_log: "{{ nfc_ssh_host_ca_decryption_key | default('') != '' }}"    # Contains a secret
+  timeout: 120
   vars:
     ansible_connection: local
   when: host_key_creation.changed | default(false) | bool
